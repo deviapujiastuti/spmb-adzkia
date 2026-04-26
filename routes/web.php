@@ -64,3 +64,42 @@ Route::get('/admin/faq', function () {
 Route::get('/admin/settings', function () {
     return view('admin.settings');
 });
+
+
+Route::get('/rekomendasi/mulai', function () { 
+    return view('user.rekomendasi-start'); 
+}); 
+
+Route::get('/rekomendasi/kuesioner', function () { 
+    return view('user.kuesioner'); 
+});
+Route::get('/rekomendasi/hasil', function () { 
+    return view('user.hasil-rekomendasi'); 
+});
+
+Route::get('/register', function () {
+    return view('user.register');
+});
+
+Route::get('/pembayaran', function () {
+    return view('user.pembayaran');
+});
+Route::get('/validasi-pembayaran', function () {
+    return view('user.validasi-pembayaran');
+});
+
+Route::get('/biodata', function () {
+    return view('user.formulir');
+});
+
+Route::get('/konfirmasi-data', function () {
+    return view('user.konfirmasi-data');
+});
+
+Route::get('/validasi-akhir', function () {
+    return view('user.validasi-akhir');
+});
+
+Route::get('/sukses', function () {
+    return view('user.sukses');
+});

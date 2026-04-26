@@ -18,9 +18,9 @@
                 Wujudkan impian masa depanmu bersama institusi pendidikan yang mengedepankan inovasi, riset, dan karakter unggul.
             </p>
             <div class="flex items-center gap-5">
-                <button class="px-8 py-4 bg-adzkia-dark text-white text-[15px] font-bold rounded-full hover:scale-105 transition-all shadow-xl shadow-adzkia-dark/20">
+                <a href="/register" class="px-8 py-4 bg-adzkia-dark text-white text-[15px] font-bold rounded-full hover:scale-105 transition-all shadow-xl shadow-adzkia-dark/20">
                     Daftar Sekarang
-                </button>
+                </a>
                 <button class="px-8 py-4 text-adzkia-dark text-[15px] font-bold rounded-full flex items-center gap-2 hover:bg-gray-100 transition-colors">
                     Unduh Brosur <i data-feather="arrow-right" class="w-4 h-4"></i>
                 </button>
@@ -48,11 +48,11 @@
                 Eksplorasi Kampus Kami
             </h2>
             <p class="text-gray-500 text-[15px] leading-relaxed mb-8">
-                Lihat lebih dekat fasilitas, lingkungan belajar, dan kehidupan mahasiswa di Universitas Adzkia melalui video dokumenter singkat kami.
+                Universitas Adzkia Padang adalah hasil konversi STKIP Adzkia Padang menjadi Universitas yang pada mulanya bernama Sekolah Tinggi Keguruan dan Ilmu Pendidikan (STKIP) Adzkia. Universitas Adzkia Padang terdiri dari 18 Program Studi. Universitas Adzkia terakreditasi Institusi dari BAN-PT.
             </p>
             <div class="border-l-[4px] border-adzkia-dark pl-5 py-1">
                 <p class="text-[14px] italic text-gray-600 font-medium leading-relaxed">
-                    "Menjadi universitas terkemuka yang menghasilkan lulusan berkarakter, cerdas, dan siap bersaing di kancah global."
+                    "Membangun masa depan melalui pendidikan berbasis karakter dan teknologi global."
                 </p>
             </div>
         </div>
@@ -120,9 +120,9 @@
                 <p class="text-gray-500 text-[14px] mb-6 max-w-[85%] font-medium leading-relaxed">
                     Temukan program studi yang paling sesuai dengan kepribadian, minat, dan potensi karir masa depanmu.
                 </p>
-                <button class="px-8 py-3 bg-adzkia-dark text-white text-[14px] font-bold rounded-full hover:bg-opacity-90 transition-all shadow-lg shadow-adzkia-dark/20">
+                <a href="/rekomendasi/mulai" class="px-8 py-3 bg-adzkia-dark text-white text-[14px] font-bold rounded-full hover:bg-opacity-90 transition-all shadow-lg shadow-adzkia-dark/20">
                     Mulai Tes Sekarang
-                </button>
+                </a>
             </div>
         </div>
     </section>
@@ -259,7 +259,7 @@
                     <div class="space-y-6">
                         <h3 class="text-2xl font-extrabold">Jalur Mandiri Reguler</h3>
                         <p class="text-gray-300 leading-relaxed font-medium">Terbuka untuk lulusan SMA/SMK sederajat melalui seleksi berbasis komputer. Pendaftaran sepenuhnya dilakukan secara daring.</p>
-                        <button class="px-10 py-4 bg-white text-adzkia-dark font-extrabold rounded-2xl hover:scale-105 transition-all shadow-xl">Daftar Sekarang</button>
+                        <a href="/register" class="px-10 py-4 bg-white text-adzkia-dark font-extrabold rounded-2xl hover:scale-105 transition-all shadow-xl">Daftar Sekarang</a>
                     </div>
                     <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
                         <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Gelombang Pendaftaran</p>
