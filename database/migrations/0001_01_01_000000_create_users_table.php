@@ -18,6 +18,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('nomor_pendaftaran')->unique()->nullable();
+            $table->string('status_pembayaran')->default('pending'); 
+            $table->string('status_seleksi')->default('proses'); 
+            $table->integer('tahap')->default(1);
             $table->timestamps();
         });
 

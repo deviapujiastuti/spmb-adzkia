@@ -83,29 +83,41 @@
                 <p class="text-[13px] font-medium text-brand-gray mt-1">Please provide your valid credentials to proceed.</p>
             </div>
 
-            <form class="space-y-6">
+            @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 text-sm font-bold rounded-2xl">
+                    <ul class="list-disc pl-5 space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('register.store') }}" method="POST" class="space-y-6">
+                @csrf
+
                 <div>
                     <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Full Name</label>
-                    <input type="text" placeholder="Enter your full name" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]">
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter your full name" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]" required>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Email Address</label>
-                    <input type="email" placeholder="email@university.edu" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]">
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="email@university.edu" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]" required>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Phone Number</label>
                     <div class="relative">
                         <span class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[14px]">+62</span>
-                        <input type="text" placeholder="812 3456 7890" class="w-full pl-16 pr-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]">
+                        <input type="text" name="no_hp" value="{{ old('no_hp') }}" placeholder="812 3456 7890" class="w-full pl-16 pr-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]" required>
                     </div>
                 </div>
 
                 <div x-data="{ show: false }">
                     <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Create Password</label>
                     <div class="relative">
-                        <input :type="show ? 'text' : 'password'" placeholder="••••••••••••" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]">
+                        <input :type="show ? 'text' : 'password'" name="password" placeholder="••••••••••••" class="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/10 focus:bg-white transition-all font-bold text-[14px]" required>
                         <button type="button" @click="show = !show" class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-dark transition-colors">
                             <i :data-feather="show ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
                         </button>
@@ -117,9 +129,9 @@
                     <button type="button" class="flex items-center gap-2 text-[13px] font-black text-gray-400 hover:text-brand-dark transition-colors uppercase tracking-widest">
                         <i data-feather="arrow-left" class="w-4 h-4"></i> Back
                     </button>
-                    <a href="/pembayaran" type="button" @click="window.location.href='/rekomendasi/mulai'" class="px-10 py-4 bg-brand-dark text-white rounded-2xl font-black text-[14px] hover:bg-brand-blue shadow-lg shadow-brand-dark/20 transition-all flex items-center gap-3 active:scale-95 group">
+                    <button type="submit" class="px-10 py-4 bg-brand-dark text-white rounded-2xl font-black text-[14px] hover:bg-brand-blue shadow-lg shadow-brand-dark/20 transition-all flex items-center gap-3 active:scale-95 group">
                         Next Step <i data-feather="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
+                    </button>
                 </div>
             </form>
         </div>
