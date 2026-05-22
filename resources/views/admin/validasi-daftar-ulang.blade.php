@@ -57,53 +57,57 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50 text-[13px]">
                     
-                    @forelse($antrian as $data)
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-xl bg-brand-dark text-white flex items-center justify-center font-black text-[12px] shadow-sm">
-                                    {{ strtoupper(substr($data->user->name, 0, 2)) }}
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-brand-dark text-[14px]">{{ $data->user->name }}</span>
-                                    <span class="text-gray-400 text-[11px] font-extrabold tracking-wider">REG-2026-00{{ $data->id }}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="px-4 py-1.5 bg-brand-blue-light text-brand-blue rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->program_studi }}</span>
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->jalur ?? 'Mandiri' }}</span>
-                        </td>
-                        <td class="px-4 py-4">
-                            @if($data->status == 'Terverifikasi')
-                                <span class="inline-flex items-center gap-1.5 text-green-500 text-[11px] font-black uppercase tracking-wider">
-                                    <div class="w-2 h-2 rounded-full bg-green-500"></div> TERVERIFIKASI
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 text-amber-500 text-[11px] font-black uppercase tracking-wider">
-                                    <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div> TIDAK LENGKAP
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="flex flex-col">
-                                <span class="font-bold text-gray-600">{{ $data->updated_at->format('d M Y') }}</span>
-                                <span class="text-gray-400 text-[11px]">{{ $data->updated_at->format('H:i') }} WIB</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button @click="bukaModal('{{ $data->user->name }}', 'REG-2026-00{{ $data->id }}', '{{ $data->id }}', '{{ $data->program_studi }}', '{{ $data->status }}')" class="px-5 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
-                                Lihat Detail
-                            </button>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500 font-bold">Belum ada data daftar ulang yang masuk.</td>
-                    </tr>
-                    @endforelse
+@forelse($antrian as $data)
+<tr class="hover:bg-gray-50/50 transition-colors">
+    <td class="px-6 py-4">
+        <div class="flex items-center gap-4">
+            {{-- Inisial Nama dari nama_lengkap --}}
+            <div class="w-10 h-10 rounded-xl bg-brand-dark text-white flex items-center justify-center font-black text-[12px] shadow-sm">
+                {{ strtoupper(substr($data->nama_lengkap ?? '??', 0, 2)) }}
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold text-brand-dark text-[14px]">
+                    {{ $data->nama_lengkap ?? 'Nama Tidak Ditemukan' }}
+                </span>
+                <span class="text-gray-400 text-[11px] font-extrabold tracking-wider">{{ $data->no_pendaftaran }}</span>
+            </div>
+        </div>
+    </td>
+    <td class="px-4 py-4">
+        <span class="px-4 py-1.5 bg-brand-blue-light text-brand-blue rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->pilihan_jurusan_1 ?? $data->program_studi }}</span>
+    </td>
+    <td class="px-4 py-4">
+        <span class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->jalur_pendaftaran ?? 'Mandiri' }}</span>
+    </td>
+    <td class="px-4 py-4">
+        @if($data->status_pembayaran == 'Terverifikasi' || $data->status == 'Terverifikasi')
+            <span class="inline-flex items-center gap-1.5 text-green-500 text-[11px] font-black uppercase tracking-wider">
+                <div class="w-2 h-2 rounded-full bg-green-500"></div> TERVERIFIKASI
+            </span>
+        @else
+            <span class="inline-flex items-center gap-1.5 text-amber-500 text-[11px] font-black uppercase tracking-wider">
+                <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div> TIDAK LENGKAP
+            </span>
+        @endif
+    </td>
+    <td class="px-4 py-4">
+        <div class="flex flex-col">
+            <span class="font-bold text-gray-600">{{ $data->updated_at->format('d M Y') }}</span>
+            <span class="text-gray-400 text-[11px]">{{ $data->updated_at->format('H:i') }} WIB</span>
+        </div>
+    </td>
+    <td class="px-6 py-4 text-center">
+        <button @click="bukaModal('{{ $data->nama_lengkap ?? 'Nama Tidak Ditemukan' }}', '{{ $data->no_pendaftaran }}', '{{ $data->id }}', '{{ $data->pilihan_jurusan_1 ?? $data->program_studi }}', '{{ $data->status_pembayaran ?? $data->status }}')" 
+                class="px-5 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
+            Lihat Detail
+        </button>
+    </td>
+</tr>
+@empty
+<tr>
+    <td colspan="6" class="px-6 py-10 text-center text-gray-500 font-bold">Belum ada data daftar ulang yang masuk.</td>
+</tr>
+@endforelse
 
                 </tbody>
             </table>

@@ -1,4 +1,8 @@
 <?php
+/// Penjinak error isVirtual akibat ketidakcocokan versi PHP
+if (!method_exists(\ReflectionProperty::class, 'isVirtual')) {
+    eval('namespace Symfony\Component\VarDumper\Caster; class ReflectionProperty { public function isVirtual() { return false; } }');
+}
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;

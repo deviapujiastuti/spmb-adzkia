@@ -68,29 +68,39 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-blue-100 text-brand-blue flex items-center justify-center font-black text-[12px]">
-                                    {{ strtoupper(substr($data->user->name, 0, 2)) }}
+                                    {{ strtoupper(substr($data->nama_lengkap ?? 'AA', 0, 2)) }}
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="font-bold text-brand-dark text-[14px]">{{ $data->user->name }}</span>
+                                    <span class="font-bold text-brand-dark text-[14px]">{{ $data->nama_lengkap }}</span>
                                     <span class="text-gray-400 text-[11px] font-extrabold tracking-wider">REG-2026-00{{ $data->id }}</span>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-4 font-bold text-gray-600">{{ $data->program_studi }}</td>
-                        <td class="px-4 py-4 font-black text-brand-dark">Rp 1.500.000</td>
+                        <td class="px-4 py-4 font-bold text-gray-600">{{ $data->pilihan_jurusan_1 }}</td>
+                        <td class="px-4 py-4 font-black text-brand-dark">Rp {{ number_format($data->nominal_biaya ?? 0, 0, ',', '.') }}</td>
                         <td class="px-4 py-4">
                             <div class="flex flex-col">
-                                <span class="font-bold text-gray-700">Bank Transfer</span>
+                                <span class="font-bold text-gray-700">{{ $data->metode_pembayaran }}</span>
                                 <span class="text-gray-400 text-[11px]">{{ $data->created_at->format('d M Y') }}</span>
                             </div>
                         </td>
                         <td class="px-4 py-4">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 {{ $data->status == 'Terverifikasi' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600' }} rounded-full text-[10px] font-black uppercase tracking-wider">
-                                <div class="w-1.5 h-1.5 rounded-full {{ $data->status == 'Terverifikasi' ? 'bg-green-500' : 'bg-amber-500 animate-pulse' }}"></div> {{ $data->status }}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 {{ $data->status_pembayaran == 'Terverifikasi' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600' }} rounded-full text-[10px] font-black uppercase tracking-wider">
+                                <div class="w-1.5 h-1.5 rounded-full {{ $data->status_pembayaran == 'Terverifikasi' ? 'bg-green-500' : 'bg-amber-500 animate-pulse' }}"></div> {{ $data->status_pembayaran }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <button @click="bukaModal('{{ $data->user->name }}', '{{ $data->id }}', '{{ $data->program_studi }}', 'Bank Mandiri', 'Rp 1.500.000', '{{ $data->created_at->format('d M Y H:i') }}')" class="px-4 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
+                            <button @click="bukaModal(
+                                        '{{ $data->nama_lengkap }}', 
+                                        '{{ $data->id }}', 
+                                        '{{ $data->pilihan_jurusan_1 }}', 
+                                        '{{ $data->metode_pembayaran }}', 
+                                        'Rp {{ number_format($data->nominal_biaya ?? 0, 0, ',', '.') }}', 
+                                        '{{ $data->created_at->format('d M Y H:i') }}',
+                                        '{{ $data->jalur_pendaftaran }}',
+                                        '{{ $data->bukti_bayar ? asset('storage/' . $data->bukti_bayar) : '' }}'
+                                    )" 
+                                        class="px-4 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
                                 Validasi
                             </button>
                         </td>
@@ -115,11 +125,7 @@
     <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
         <div x-show="modalOpen" x-transition.opacity @click="modalOpen = false" class="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm cursor-pointer"></div>
         
-        <div x-show="modalOpen" 
-             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0" 
-             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-4" 
-             class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
-            
+        <div x-show="modalOpen" class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div>
                     <h2 class="text-xl font-extrabold text-brand-dark tracking-tight">Detail Validasi Pembayaran</h2>
@@ -141,13 +147,17 @@
                             <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Program Studi Pilihan</p>
                             <span class="px-3 py-1 bg-brand-blue-light text-brand-blue rounded-lg text-[12px] font-bold inline-block" x-text="dataPendaftar.prodi"></span>
                         </div>
+                        <div>
+                            <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Jalur Pendaftaran</p>
+                            <p class="text-[14px] font-bold text-gray-700" x-text="dataPendaftar.jalurLengkap"></p>
+                        </div>
                         <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
                             <div class="flex justify-between items-center">
                                 <span class="text-[12px] font-bold text-gray-500">Nominal Transfer</span>
                                 <span class="text-[14px] font-black text-brand-dark" x-text="dataPendaftar.nominal"></span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-[12px] font-bold text-gray-500">Bank Asal</span>
+                                <span class="text-[12px] font-bold text-gray-500">Metode Pembayaran</span>
                                 <span class="text-[13px] font-bold text-brand-dark" x-text="dataPendaftar.bank"></span>
                             </div>
                             <div class="flex justify-between items-center">
@@ -156,58 +166,44 @@
                             </div>
                         </div>
                     </div>
-
                     <div>
-                        <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2 flex justify-between items-center">
-                            Bukti Transfer 
-                        </p>
-                        <div class="w-full h-64 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center p-2 relative group overflow-hidden cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1620241608701-94efadcf58cb?w=400&h=600&fit=crop" class="w-full h-full object-cover rounded-xl opacity-80 group-hover:opacity-100 transition-opacity">
+                        <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">Bukti Transfer</p>
+                        <div class="w-full h-64 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center p-2">
+                            <img :src="dataPendaftar.buktiUrl" class="w-full h-full object-contain rounded-xl" alt="Bukti Pembayaran">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="p-6 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <button @click="modalOpen = false" class="px-6 py-3 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-bold text-[13px] transition-colors">
-                    Tolak
-                </button>
+                <button @click="modalOpen = false" class="px-6 py-3 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-bold text-[13px] transition-colors">Tolak</button>
                 <div class="flex gap-3">
-                    <button @click="modalOpen = false" class="px-6 py-3 border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 rounded-xl font-bold text-[13px] transition-colors">
-                        Batal
-                    </button>
-                    
-                    <form :action="'/admin/setujui-pembayaran/' + dataPendaftar.id" method="POST">
+                    <button @click="modalOpen = false" class="px-6 py-3 border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 rounded-xl font-bold text-[13px]">Batal</button>
+                    <<form action="{{ route('admin.setujui.pembayaran', $data->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="px-6 py-3 bg-brand-blue text-white hover:bg-opacity-90 rounded-xl font-bold text-[13px] transition-colors shadow-lg shadow-brand-blue/20 flex items-center gap-2">
-                            <i data-feather="check-circle" class="w-4 h-4"></i> Setujui & Verifikasi
+                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
+                            Setujui & Verifikasi
                         </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
 <script>
     function validasiPembayaran() {
-        return {
-            modalOpen: false,
-            dataPendaftar: {
-                nama: '', id: '', prodi: '', bank: '', nominal: '', tanggal: ''
-            },
-            
-            bukaModal(nama, id, prodi, bank, nominal, tanggal) {
-                this.dataPendaftar = { nama, id, prodi, bank, nominal, tanggal };
-                this.modalOpen = true;
-                setTimeout(() => {
-                    if (typeof feather !== 'undefined') {
-                        feather.replace();
-                    }
-                }, 100);
-            }
+    return {
+        modalOpen: false,
+        // Pastikan 'buktiUrl' ada di sini!
+        dataPendaftar: { nama: '', id: '', prodi: '', bank: '', nominal: '', tanggal: '', jalurLengkap: '', buktiUrl: '' },
+        
+        bukaModal(nama, id, prodi, bank, nominal, tanggal, jalurLengkap, buktiUrl) {
+    console.log("Path Gambar yang diterima:", buktiUrl); // Lihat ini di Console browser (F12)
+    this.dataPendaftar = { nama, id, prodi, bank, nominal, tanggal, jalurLengkap, buktiUrl };
+    this.modalOpen = true;
         }
     }
+}
 </script>
 @endsection

@@ -74,6 +74,18 @@
 
         <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-brand-dark/5 border border-gray-100 w-full">
             
+            {{-- Menampilkan Alert Error dari Validasi Laravel Back-End jika Input Tidak Sesuai --}}
+            @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-sm text-red-700 font-semibold">
+                    <p class="font-bold mb-1">Periksa kembali isian Anda:</p>
+                    <ul class="list-disc list-inside space-y-1 text-xs">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div x-show="stage === 1" x-transition:enter="transition ease-out duration-300">
                 <div class="mb-8">
                     <h2 class="text-2xl font-black text-brand-dark tracking-tight">Pilih Jalur Pendaftaran</h2>
@@ -107,13 +119,19 @@
                             <select x-model="specificJalur" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-brand-blue transition-all font-bold text-[14px] text-brand-dark appearance-none cursor-pointer">
                                 <option value="" disabled selected>-- Pilih Kategori Program Khusus --</option>
                                 
-                                @foreach($jalurKhusus as $category => $items)
-                                    <optgroup label="{{ $category }}">
-                                        @foreach($items as $jalur)
-                                            <option value="{{ $jalur->name }}">{{ $jalur->name }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
+                                @if(isset($jalurKhusus) && is_array($jalurKhusus))
+                                    @foreach($jalurKhusus as $category => $items)
+                                        <optgroup label="{{ $category }}">
+                                            @foreach($items as $jalur)
+                                                <option value="{{ $jalur->name }}">{{ $jalur->name }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                @else
+                                    <option value="Prestasi">Jalur Prestasi Akademik / Non-Akademik</option>
+                                    <option value="Kemitraan">Jalur Kemitraan Instansi</option>
+                                    <option value="Rekomendasi">Jalur Rekomendasi Yayasan</option>
+                                @endif
 
                             </select>
                             <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
@@ -140,54 +158,58 @@
                 <form action="{{ route('register.store') }}" method="POST" class="space-y-5">
                     @csrf
                     
-                    <input type="hidden" name="jalur" x-bind:value="selectedJalur">
-                    <input type="hidden" name="jalur_detail" x-bind:value="specificJalur">
+                    {{-- Input Hidden untuk mengirimkan data pilihan jalur dari Alpine.js ke Back-end Laravel --}}
+                    <input type="hidden" name="jalur_pendaftaran" x-bind:value="selectedJalur">
+                    <input type="hidden" name="spesifikasi_jalur" x-bind:value="specificJalur">
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Nama Lengkap (Sesuai Ijazah)</label>
-                        <input type="text" name="name" required placeholder="Masukkan nama lengkap Anda" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
+                        <input type="text" name="nama_lengkap" required value="{{ old('nama_lengkap') }}" placeholder="Masukkan nama lengkap Anda" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">NIK (Nomor Induk Kependudukan)</label>
-                            <input type="text" name="nik" required placeholder="16 Digit NIK" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
+                            <input type="text" name="nik" required value="{{ old('nik') }}" placeholder="16 Digit NIK" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">No. WhatsApp</label>
-                            <input type="text" name="no_hp" required placeholder="Contoh: 08123456789" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
+                            <input type="text" name="no_whatsapp" required value="{{ old('no_whatsapp') }}" placeholder="Contoh: 08123456789" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Alamat Email</label>
-                        <input type="email" name="email" required placeholder="nama@email.com" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
+                        <input type="email" name="email" required value="{{ old('email') }}" placeholder="nama@email.com" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Pilihan Jurusan 1</label>
-                            <select name="program_studi_1" required class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px] text-brand-dark cursor-pointer">
-                                <option value="" disabled selected>Pilih Jurusan Utama</option>
-                                @foreach($prodis as $prodi)
-                                    <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                    
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex-1">
+                            <label class="block text-sm font-bold mb-2">Pilihan Program Studi 1</label>
+                            <select name="pilihan_jurusan_1" class="w-full border rounded-xl p-3">
+                                <option value="">-- Pilih Prodi --</option>
+                                @foreach($prodiList as $prodi)
+                                <option value="{{ $prodi->nama }}">{{ $prodi->nama }} ({{ $prodi->jenjang }})</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Pilihan Jurusan 2</label>
-                            <select name="program_studi_2" required class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px] text-brand-dark cursor-pointer">
-                                <option value="" disabled selected>Pilih Jurusan Cadangan</option>
-                                @foreach($prodis as $prodi)
-                                    <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                        
+                        <div class="flex-1">
+                            <label class="block text-sm font-bold mb-2">Pilihan Program Studi 2</label>
+                            <select name="pilihan_jurusan_2" class="w-full border rounded-xl p-3">
+                                <option value="">-- Pilih Prodi --</option>
+                                @foreach($prodiList as $prodi)
+                                <option value="{{ $prodi->nama }}">{{ $prodi->nama }} ({{ $prodi->jenjang }})</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
+        </div>
 
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Alamat Rumah Lengkap</label>
-                        <textarea name="alamat" required rows="2" placeholder="Nama jalan, RT/RW, Kecamatan, Kota/Kabupaten..." class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px] resize-none"></textarea>
+                        <textarea name="alamat_rumah" required rows="2" placeholder="Nama jalan, RT/RW, Kecamatan, Kota/Kabupaten..." class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px] resize-none">{{ old('alamat_rumah') }}</textarea>
                     </div>
 
                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -204,17 +226,17 @@
         </div>
     </main>
 
-    <footer class="w-full bg-brand-bg py-8 flex flex-col md:flex-row justify-center md:justify-between items-center gap-4 px-10 border-t border-gray-100">
+    <nav class="w-full bg-brand-bg py-8 flex flex-col md:flex-row justify-center md:justify-between items-center gap-4 px-10 border-t border-gray-100">
         <p class="text-[11px] font-bold text-gray-400">© 2026 Universitas Adzkia. All Rights Reserved.</p>
-    </footer>
+    </nav>
 
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('registerApp', () => ({
                 currentStep: 1,
-                stage: 1, 
-                selectedJalur: null,
-                specificJalur: '',
+                stage: {{ $errors->any() ? 2 : 1 }}, // Otomatis tetap di stage formulir jika ada error kiriman backend
+                selectedJalur: '{{ old("jalur_pendaftaran", "Reguler") }}',
+                specificJalur: '{{ old("spesifikasi_jalur", "") }}',
                 
                 steps: [
                     { id: 1, title: 'Pendaftaran' }, { id: 2, title: 'Biaya Pendaftaran' },

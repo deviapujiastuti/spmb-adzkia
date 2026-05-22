@@ -6,31 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('data_pendaftar', function (Blueprint $table) {
+        Schema::create('data_pendaftars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            
-            $table->string('no_hp');
-            $table->string('program_studi')->nullable();
-            $table->string('jalur')->nullable(); 
-            $table->string('jalur_detail')->nullable(); 
-            
-            $table->string('status')->default('Diproses');
-            
-            $table->timestamps(); 
+            $table->string('no_pendaftaran')->unique();
+            $table->string('jalur_pendaftaran')->default('Reguler'); // Reguler atau Khusus
+            $table->string('nama_lengkap');
+            $table->string('nik')->unique();
+            $table->string('no_whatsapp');
+            $table->string('email')->unique();
+            $table->string('pilihan_jurusan_1');
+            $table->string('pilihan_jurusan_2');
+            $table->text('alamat_rumah');
+            $table->string('password');
+            $table->integer('nominal_biaya')->default(0); // Diatur dinamis lewat nominal admin
+            $table->string('status_pembayaran')->default('Belum Bayar');
+            $table->string('metode_pembayaran')->nullable(); // Menyimpan metode pembayaran yang dipilih
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('data_pendaftar');
+        Schema::dropIfExists('data_pendaftars');
     }
 };

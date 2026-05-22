@@ -64,7 +64,18 @@
         <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-brand-dark/5 border border-gray-100">
             
             <div class="mb-8">
-                <h1 class="text-3xl font-black text-brand-dark tracking-tight">Validasi Pembayaran</h1>
+                <h1 class="text-3xl font-black text-brand-dark tracking-tight mb-4">Validasi Pembayaran</h1>
+    
+                    @if($pendaftar->status_pembayaran == 'Menunggu Validasi')
+                        <div class="bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl font-bold mb-4">
+                            Bukti pembayaran sedang diperiksa oleh Admin. Mohon tunggu 1x24 jam.
+                        </div>
+                    @elseif($pendaftar->status_pembayaran == 'Terverifikasi')
+                        <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl font-bold mb-4">
+                            Pembayaran Berhasil! Anda sudah bisa lanjut ke tahap berikutnya.
+                        <a href="{{ route('pendaftaran.biodata') }}" class="underline ml-2">Klik di sini</a>
+                        </div>
+                    @endif
             </div>
 
             <div class="bg-amber-50 border border-amber-100 rounded-2xl p-5 flex gap-4 items-start mb-8">
@@ -82,29 +93,29 @@
             <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4 mb-8">
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Program Studi</p>
-                    <h4 class="text-[14px] font-extrabold text-brand-dark">S1 Informatika</h4>
+                    <h4 class="text-[14px] font-extrabold text-brand-dark">{{ $pendaftar->pilihan_jurusan_1 }}</h4>
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Jalur Pendaftaran</p>
-                    <h4 class="text-[14px] font-extrabold text-brand-dark">Reguler Gelombang 1</h4>
+                    <h4 class="text-[14px] font-extrabold text-brand-dark">{{ $pendaftar->jalur_pendaftaran }}</h4>
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Total Bayar</p>
-                    <h4 class="text-[14px] font-extrabold text-brand-dark">Rp 500.000</h4>
+                    <h4 class="text-[14px] font-extrabold text-brand-dark">Rp {{ number_format($pendaftar->nominal_biaya ?? 0, 0, ',', '.') }}</h4>
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Metode Pembayaran</p>
-                    <h4 class="text-[14px] font-extrabold text-brand-dark">Virtual Account BNI</h4>
+                    <h4 class="text-[14px] font-extrabold text-brand-dark">{{ $pendaftar->metode_pembayaran }}</h4>
                 </div>
             </div>
 
             <div class="mb-8">
                 <div class="relative w-full h-40 rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group overflow-hidden"
-                     :class="isDragging ? 'border-brand-blue bg-brand-blue-light scale-[1.02]' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'"
-                     @dragover.prevent="isDragging = true"
-                     @dragleave.prevent="isDragging = false"
-                     @drop.prevent="handleDrop($event)"
-                     @click="$refs.fileInput.click()">
+                      :class="isDragging ? 'border-brand-blue bg-brand-blue-light scale-[1.02]' : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50'"
+                      @dragover.prevent="isDragging = true"
+                      @dragleave.prevent="isDragging = false"
+                      @drop.prevent="handleDrop($event)"
+                      @click="$refs.fileInput.click()">
                     
                     <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
                     
@@ -150,17 +161,29 @@
                 </p>
             </div>
 
-            <div class="flex flex-col items-center gap-4">
-                <button @click="uploadSekarang()" 
-                        class="w-full py-4 rounded-2xl font-black text-[15px] transition-all active:scale-[0.98] shadow-lg"
-                        :class="fileName ? 'bg-brand-dark text-white hover:bg-brand-blue shadow-brand-dark/20' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
-                    Upload Sekarang
-                </button>
-                <a href="/pembayaran" class="text-[13px] font-extrabold text-gray-500 hover:text-brand-dark transition-colors py-2">
-                    Kembali
-                </a>
-            </div>
+            <form action="{{ route('user.upload-bukti') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                
+                <input type="file" 
+                    name="bukti_bayar" 
+                    x-ref="fileInput" 
+                    @change="handleFileSelect($event)" 
+                    class="hidden" 
+                    accept=".jpg,.jpeg,.png">
 
+                    <div class="flex flex-col items-center gap-4">
+                        <button type="submit" 
+                                :disabled="!fileName"
+                                class="w-full py-4 rounded-2xl font-black text-[15px] transition-all active:scale-[0.98] shadow-lg"
+                                :class="fileName ? 'bg-brand-dark text-white hover:bg-brand-blue shadow-brand-dark/20' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+                            Upload Sekarang
+                        </button>
+        
+                        <a href="/pembayaran" class="text-[13px] font-extrabold text-gray-500 hover:text-brand-dark transition-colors py-2">
+                        Kembali
+                        </a>
+                    </div>
+                </form>
         </div>
     </main>
 
@@ -179,7 +202,6 @@
                 currentStep: 3,
                 isDragging: false,
                 fileName: null,
-                
                 steps: [
                     { id: 1, title: 'Pendaftaran' },
                     { id: 2, title: 'Biaya Pendaftaran' },
@@ -189,7 +211,6 @@
                     { id: 6, title: 'Ujian' },
                     { id: 7, title: 'Hasil' }
                 ],
-
                 handleDrop(e) {
                     this.isDragging = false;
                     if (e.dataTransfer.files.length > 0) {
@@ -197,25 +218,19 @@
                         this.refreshIcon();
                     }
                 },
-
                 handleFileSelect(e) {
                     if (e.target.files.length > 0) {
                         this.fileName = e.target.files[0].name;
                         this.refreshIcon();
                     }
                 },
-
                 uploadSekarang() {
                     if (!this.fileName) {
                         alert('Silakan pilih atau tarik file bukti pembayaran terlebih dahulu!');
                         return;
                     }
-                    // Logika submit ke backend ditaruh di sini
-                    alert('Bukti pembayaran (' + this.fileName + ') berhasil diupload! Menunggu validasi admin.');
-                    // Setelah sukses, arahkan ke Step 4 (Biodata)
-                    window.location.href = '/biodata';
+                    alert('Bukti berhasil diunggah! Mohon tunggu validasi admin.');
                 },
-                
                 refreshIcon() {
                     this.$nextTick(() => {
                         if(window.feather) feather.replace();
@@ -223,8 +238,6 @@
                 }
             }));
         });
-
-        // Initialize Feather Icons
         document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
         });

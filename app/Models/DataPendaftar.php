@@ -2,30 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use App\Models\User; 
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class DataPendaftar extends Model
+class DataPendaftar extends Authenticatable
 {
-    use HasFactory;
+    use Notifiable;
 
-    protected $table = 'data_pendaftar'; 
+    protected $table = 'data_pendaftars';
 
     protected $fillable = [
-        'user_id',
-        'no_hp',
-        'program_studi',
-        'jalur',
-        'jalur_detail',
-        'status',
-        'nilai_seleksi',
-        'status_kelulusan',
+        'no_pendaftaran',
+        'jalur_pendaftaran',
+        'nama_lengkap',
+        'nik',
+        'no_whatsapp',
+        'email',
+        'pilihan_jurusan_1',
+        'pilihan_jurusan_2',
+        'alamat_rumah',
+        'password',
+        'nominal_biaya',
+        'status_pembayaran',
+        'metode_pembayaran', 
+        'bukti_bayar',
     ];
 
-    
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    protected $hidden = [
+        'password',
+    ];
+
+    // Relasi untuk mengambil data pilihan jurusan 1 secara dinamis
+public function prodi1()
+{
+    return $this->belongsTo(Prodi::class, 'pilihan_jurusan_1', 'id');
+}
+
+public function user()
+{
+    return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+}
 }

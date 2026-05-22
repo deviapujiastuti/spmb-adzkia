@@ -225,33 +225,41 @@
                     </div>
                 </section>
 
+                
                 <section class="bg-[#F8FAFC] p-8 md:p-10 rounded-[2rem] border border-gray-100">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-white shadow-sm text-brand-dark rounded-xl flex items-center justify-center">
-                            <i data-feather="search" class="w-5 h-5"></i>
-                        </div>
-                        <h2 class="text-lg font-black text-brand-dark">Pilihan Program Studi</h2>
-                    </div>
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-white shadow-sm text-brand-dark rounded-xl flex items-center justify-center">
+            <i data-feather="search" class="w-5 h-5"></i>
+        </div>
+        <h2 class="text-lg font-black text-brand-dark">Pilihan Program Studi</h2>
+    </div>
 
-                    <div>
-                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Cari Program Studi</label>
-                        <div class="relative mb-4">
-                            <i data-feather="book" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-                            <select class="w-full pl-14 pr-5 py-4 bg-white border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all font-extrabold text-[14px] text-brand-dark appearance-none cursor-pointer">
-                                <option value="" disabled selected>Contoh: Informatika, Manajemen...</option>
-                                <option>S1 Informatika</option>
-                                <option>S1 Sistem Informasi</option>
-                                <option>S1 Teknik Sipil</option>
-                            </select>
-                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-3 py-1.5 bg-brand-blue-light text-brand-blue rounded-lg text-[11px] font-black tracking-wide cursor-pointer hover:bg-blue-100 transition-colors">S1 Ilmu Komputer</span>
-                            <span class="px-3 py-1.5 bg-brand-blue-light text-brand-blue rounded-lg text-[11px] font-black tracking-wide cursor-pointer hover:bg-blue-100 transition-colors">S1 Teknik Sipil</span>
-                            <span class="px-3 py-1.5 bg-brand-blue-light text-brand-blue rounded-lg text-[11px] font-black tracking-wide cursor-pointer hover:bg-blue-100 transition-colors">S1 Hukum</span>
-                        </div>
-                    </div>
-                </section>
+    <div>
+        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Cari Program Studi</label>
+        <div class="relative mb-4">
+            <i data-feather="book" class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+            
+            <select name="prodi_id" class="w-full pl-14 pr-5 py-4 bg-white border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all font-extrabold text-[14px] text-brand-dark appearance-none cursor-pointer">
+                <option value="" disabled selected>Pilih Program Studi...</option>
+                
+                {{-- Gunakan $prodi->nama sesuai hasil debug --}}
+                @foreach($prodis as $prodi)
+                    <option value="{{ $prodi->id }}">{{ $prodi->nama }}</option>
+                @endforeach
+            </select>
+            
+            <i data-feather="chevron-down" class="w-5 h-5 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+            @foreach($prodis->take(3) as $prodi)
+                <span class="px-3 py-1.5 bg-brand-blue-light text-brand-blue rounded-lg text-[11px] font-black tracking-wide cursor-pointer hover:bg-blue-100 transition-colors">
+                    {{ $prodi->nama }}
+                </span>
+            @endforeach
+        </div>
+    </div>
+</section>
 
                 <section>
                     <div class="flex items-center gap-3 mb-6">
