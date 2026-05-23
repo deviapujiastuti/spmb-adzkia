@@ -158,7 +158,6 @@
                 <form action="{{ route('register.store') }}" method="POST" class="space-y-5">
                     @csrf
                     
-                    {{-- Input Hidden untuk mengirimkan data pilihan jalur dari Alpine.js ke Back-end Laravel --}}
                     <input type="hidden" name="jalur_pendaftaran" x-bind:value="selectedJalur">
                     <input type="hidden" name="spesifikasi_jalur" x-bind:value="specificJalur">
 
@@ -182,7 +181,6 @@
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Alamat Email</label>
                         <input type="email" name="email" required value="{{ old('email') }}" placeholder="nama@email.com" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px]">
                     </div>
-
                     
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex-1">
@@ -205,8 +203,8 @@
                             </select>
                         </div>
                     </div>
-        </div>
 
+                    {{-- Alamat dipindahkan ke sini agar tertutup oleh x-show stage === 2 --}}
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Alamat Rumah Lengkap</label>
                         <textarea name="alamat_rumah" required rows="2" placeholder="Nama jalan, RT/RW, Kecamatan, Kota/Kabupaten..." class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all font-bold text-[14px] resize-none">{{ old('alamat_rumah') }}</textarea>
