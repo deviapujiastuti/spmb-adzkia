@@ -10,14 +10,12 @@ use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
-    // Menampilkan Form Pendaftaran
     public function showRegister()
     {
         $prodiList = \App\Models\Prodi::all(); 
         return view('user.register', compact('prodiList'));
     }
 
-    // Memproses Pendaftaran & Menampilkan Detail Akun
     public function storeRegister(Request $request)
     {
         $request->validate([
@@ -59,8 +57,7 @@ class RegisterController extends Controller
         ]);
     }
 
-    // Proses Login
-    public function loginProses(Request $request)
+ public function loginProses(Request $request)
     {
         $request->validate([
             'login_input' => 'required',
@@ -75,56 +72,18 @@ class RegisterController extends Controller
              session()->put('pendaftar_id', $pendaftar->id); 
              session()->put('nama_pendaftar', $pendaftar->nama_lengkap);
              
-             return redirect()->route('pembayaran.index');
+             // KUNCI PERBAIKAN: Selalu arahkan ke hub dashboard utama terlebih dahulu
+             return redirect()->route('dashboard.user');
         }
+
+        return back()->withErrors(['login_error' => 'Email/No. Pendaftaran atau Password salah.'])->onlyInput('login_input');
     }
 
-    // Simpan Metode Pembayaran
-    public function simpanPembayaran(Request $request)
+    public function logout()
     {
-        $pendaftarId = session('pendaftar_id');
-        if (!$pendaftarId) return back()->withErrors(['error' => 'Sesi habis, silakan login kembali.']);
-
-        $pendaftar = DataPendaftar::find($pendaftarId);
-        if ($pendaftar) {
-            $pendaftar->update([
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'status_pembayaran' => 'Menunggu Upload'
-            ]);
-            return redirect()->route('pendaftaran.validasi');
-        }
-        return back()->withErrors(['error' => 'Data pendaftar tidak ditemukan.']);
+        session()->forget(['pendaftar_id', 'nama_pendaftar']);
+        return redirect()->route('login');
     }
-
-    // FUNGSI BARU: Memproses Upload Bukti Bayar
-    public function prosesUploadBukti(Request $request)
-{
-    // Validasi file
-    $request->validate(['bukti_bayar' => 'required|image|mimes:jpeg,png,jpg|max:2048']);
-    
-    // Ambil user dari session
-    $pendaftarId = session('pendaftar_id');
-    $pendaftar = DataPendaftar::find($pendaftarId);
-
-    // Cek apakah pendaftar ketemu
-    if (!$pendaftar) {
-        return back()->withErrors(['error' => 'Data tidak ditemukan, coba login ulang!']);
-    }
-
-    // Proses upload
-    if ($request->hasFile('bukti_bayar')) {
-        $path = $request->file('bukti_bayar')->store('bukti_pembayaran', 'public');
-        
-        // UPDATE DATABASE
-        $pendaftar->bukti_bayar = $path;
-        $pendaftar->status_pembayaran = 'Menunggu Validasi'; // Sesuaikan status ini
-        $pendaftar->save(); // PAKAI SAVE() SUPAYA LEBIH PASTI
-
-        return back()->with('success', 'Berhasil!');
-    }
-    
-    return back()->withErrors(['error' => 'Gagal upload']);
-}
 
     private function kirimNotifikasiWA($nomor, $nama, $username, $password)
     {

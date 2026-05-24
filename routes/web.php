@@ -17,78 +17,69 @@ Route::get('/berita', function () { return view('berita'); });
 Route::get('/login', function () { return view('login'); })->name('login');
 Route::get('/login-admin', function () { return view('login-admin'); });
 
-// Registrasi & Auth
 Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
 Route::post('/register', [RegisterController::class, 'storeRegister'])->name('register.store');
 Route::post('/login-proses', [RegisterController::class, 'loginProses'])->name('login.proses');
+Route::post('/logout', [RegisterController::class, 'logout'])->name('logout');
 
 // ==========================================
-// 2. HALAMAN USER (Memerlukan Auth)
+// 2. HALAMAN USER (Tanpa Middleware Auth Bawaan)
 // ==========================================
-Route::middleware(['auth'])->group(function () {
-    
-    Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard-user', [DashboardUserController::class, 'pembayaranIndex'])->name('dashboard.user'); 
-    
-    // Pembayaran
-    Route::get('/pembayaran', [DashboardUserController::class, 'pembayaranIndex'])->name('pembayaran.index');
-    Route::post('/upload-bukti', [RegisterController::class, 'prosesUploadBukti'])->name('user.upload-bukti');
-    Route::get('/validasi-pembayaran', [DashboardUserController::class, 'validasiUser'])->name('pendaftaran.validasi');
+Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');
+Route::get('/dashboard-user', [DashboardUserController::class, 'dashboardUser'])->name('dashboard.user'); 
 
-    // Biodata
-    Route::get('/formulir-biodata/{id}', [DashboardUserController::class, 'editBiodata'])->name('pendaftaran.biodata');
-    Route::get('/edit-biodata/{id}', [DashboardUserController::class, 'editBiodata'])->name('edit-biodata');
-    Route::put('/simpan-biodata/{id}', [DashboardUserController::class, 'update'])->name('simpan-biodata');
+// Pembayaran
+Route::get('/pembayaran', [DashboardUserController::class, 'pembayaranIndex'])->name('dashboard.user');
+Route::post('/pembayaran/proses', [DashboardUserController::class, 'prosesPembayaran'])->name('simpan.pembayaran');
+Route::post('/upload-bukti', [DashboardUserController::class, 'prosesUploadBukti'])->name('user.upload-bukti');
+Route::get('/validasi-pembayaran', [DashboardUserController::class, 'validasiUser'])->name('pendaftaran.validasi');
 
-    // Konfirmasi & Finalisasi
-    Route::get('/konfirmasi-data/{id}', [DashboardUserController::class, 'tampilkanKonfirmasi'])->name('konfirmasi-data');
-    Route::post('/proses-konfirmasi/{id}', [DashboardUserController::class, 'prosesKonfirmasi'])->name('proses.konfirmasi');
-    Route::get('/validasi-akhir/{id}', [DashboardUserController::class, 'tampilkanValidasiAkhir'])->name('pendaftaran.validasiakhir');
-    
-    Route::get('/sukses', [DashboardUserController::class, 'tampilkanSukses'])->name('pendaftaran.sukses'); 
+// Biodata
+Route::get('/formulir-biodata', [DashboardUserController::class, 'biodataIndex'])->name('pendaftaran.biodata');
+Route::post('/simpan-biodata', [DashboardUserController::class, 'simpanBiodata'])->name('simpan-biodata');
+Route::get('/edit-biodata', [DashboardUserController::class, 'editBiodata'])->name('edit-biodata');
+Route::put('/update-biodata/{id}', [DashboardUserController::class, 'update'])->name('update-biodata');
 
-    // Rekomendasi
-    Route::get('/rekomendasi/mulai', function () { return view('user.rekomendasi-start'); }); 
-    Route::get('/rekomendasi/kuesioner', function () { return view('user.kuesioner'); });
-    Route::get('/rekomendasi/hasil', function () { return view('user.hasil-rekomendasi'); });
-});
+// Konfirmasi & Finalisasi
+Route::get('/konfirmasi-data/{id}', [DashboardUserController::class, 'tampilkanKonfirmasi'])->name('konfirmasi-data');
+Route::post('/proses-konfirmasi/{id}', [DashboardUserController::class, 'prosesKonfirmasi'])->name('proses.konfirmasi');
+Route::get('/validasi-akhir/{id}', [DashboardUserController::class, 'tampilkanValidasiAkhir'])->name('pendaftaran.validasiakhir');
+
+Route::get('/sukses', [DashboardUserController::class, 'tampilkanSukses'])->name('pendaftaran.sukses'); 
+
+// Rekomendasi
+Route::get('/rekomendasi/mulai', function () { return view('user.rekomendasi-start'); }); 
+Route::get('/rekomendasi/kuesioner', function () { return view('user.kuesioner'); });
+Route::get('/rekomendasi/hasil', function () { return view('user.hasil-rekomendasi'); });
 
 // ==========================================
 // 3. HALAMAN ADMIN
 // ==========================================
-// Catatan: Sebaiknya tambahkan middleware(['auth', 'admin']) jika sudah ada sistem role
 Route::get('/admin', [AdminPendaftarController::class, 'dashboard'])->name('admin.dashboard'); 
 Route::get('/admin/pendaftar', [AdminPendaftarController::class, 'index'])->name('admin.pendaftar.index');
 
-// Validasi Pembayaran Admin
 Route::get('/admin/validasi-pembayaran', [AdminPendaftarController::class, 'validasiPembayaranIndex'])->name('admin.pembayaran');
 Route::post('/admin/proses-validasi', [DashboardUserController::class, 'prosesValidasi'])->name('admin.proses.validasi');
 
-// Daftar Ulang Admin
 Route::get('/admin/validasi-daftar-ulang', [AdminPendaftarController::class, 'daftarUlangIndex'])->name('admin.validasi.daftarulang');
 Route::post('/admin/setujui-daftar-ulang/{id}', [AdminPendaftarController::class, 'setujuiDaftarUlang'])->name('admin.setujui-daftar-ulang');
 
-// Pengumuman & Kelulusan
 Route::get('/admin/pengumuman', [AdminPendaftarController::class, 'pengumumanIndex'])->name('admin.pengumuman');
 Route::post('/admin/update-kelulusan/{id}', [AdminPendaftarController::class, 'updateKelulusan'])->name('admin.update-kelulusan');
 
-// Lain-lain Admin
 Route::get('/admin/faq', function () { return view('admin.faq'); });
 Route::get('/admin/settings', function () { return view('admin.settings'); });
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Prodi
     Route::get('/prodi', [AdminProgramStudiController::class, 'index'])->name('prodi.index');
     Route::post('/prodi', [AdminProgramStudiController::class, 'store'])->name('prodi.store');
     Route::put('/prodi/{id}', [AdminProgramStudiController::class, 'update'])->name('prodi.update');
     Route::delete('/prodi/{id}', [AdminProgramStudiController::class, 'destroy'])->name('prodi.destroy');
     
-    // Berita
     Route::get('/berita', [AdminBeritaController::class, 'index'])->name('berita.index');
     Route::get('/berita/create', [AdminBeritaController::class, 'create'])->name('berita.create');
     Route::post('/berita/store', [AdminBeritaController::class, 'store'])->name('berita.store');
     
-    // Tugas
     Route::get('/tugas', [AdminTugasController::class, 'index'])->name('tugas.index');
     Route::put('/tugas/{id}', [AdminTugasController::class, 'update'])->name('tugas.update');
 });

@@ -84,7 +84,7 @@
                 </p>
             </div>
 
-            <form action="{{ route('simpan-biodata', $pendaftar->id) }}" method="POST"> 
+            <form action="{{ route('simpan-biodata') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 
