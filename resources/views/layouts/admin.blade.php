@@ -37,10 +37,8 @@
     <aside class="w-[280px] bg-white border-r border-gray-100 flex flex-col fixed h-screen z-20">
         
         <div class="h-24 flex items-center px-8 gap-3">
-            <div class="w-10 h-12 bg-orange-500 rounded-b-xl rounded-t-sm flex items-end justify-center pb-1 relative">
-                <div class="absolute top-0 w-full h-3 bg-red-600 rounded-t-sm"></div>
-                <div class="w-3 h-3 bg-white rounded-full"></div>
-            </div>
+        <img src="{{ asset('images/logo-adzkia.png') }}" alt="Logo Universitas Adzkia" class="h-11 w-auto transition-transform group-hover:scale-105 duration-300">
+
             <div class="flex flex-col">
                 <span class="font-extrabold text-[18px] tracking-tight leading-tight text-brand-dark">SPMB Portal</span>
                 <span class="text-[12px] font-semibold text-brand-gray">Adzkia Admin</span>

@@ -12,17 +12,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
 
-    <script>
+<script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Manrope', 'sans-serif'] },
                     colors: {
-                        'adzkia-dark': '#0A1B3A',
-                        'adzkia-muted': '#889CB5',
-                        'adzkia-badge-bg': '#EEF4FF',
-                        'adzkia-badge-txt': '#2D68F8',
-                        'adzkia-bg': '#FAFBFC',
+                        // 1. Warna Utama Resmi Adzkia
+                        'adzkia-red': '#d9241c',
+                        'adzkia-blue': '#2c7ebd',
+                        
+                        // 2. Warna Netral & Background
+                        'adzkia-bg': '#FAFBFC', // Putih abu-abu sangat muda untuk background
+                        'adzkia-dark': '#1e293b', // Abu-abu sangat gelap untuk teks bacaan agar nyaman di mata
+                        'adzkia-muted': '#64748b', // Untuk teks sekunder/deskripsi
+                        
+                        // 3. Penyesuaian Badge (Sekarang kita buat bernuansa Biru/Merah Adzkia)
+                        'adzkia-badge-bg': '#eff6ff', // Biru sangat muda
+                        'adzkia-badge-txt': '#2c7ebd', // Menggunakan biru Adzkia
+                        
+                        'adzkia-badge-red-bg': '#fef2f2', // Merah sangat muda
+                        'adzkia-badge-red-txt': '#d9241c', // Menggunakan merah Adzkia
                     }
                 }
             }
@@ -129,12 +139,10 @@
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
     <script>
-        feather.replace();
-    </script>
-<script src="https://unpkg.com/feather-icons"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('load', function() {
             feather.replace();
         });
     </script>
