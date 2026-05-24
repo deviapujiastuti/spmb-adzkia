@@ -84,7 +84,7 @@
                 </p>
             </div>
 
-            <form action="{{ route('simpan-biodata') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('simpan-biodata') }}" method="POST" x-data="formulirApp" enctype="multipart/form-data">
                 @csrf
                 
                 @if ($errors->any())
@@ -181,54 +181,40 @@
                             <textarea name="alamat_rumah" rows="3" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark resize-none">{{ old('alamat_rumah', $pendaftar->alamat_rumah ?? '') }}</textarea>
                         </div>
 
-<div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Provinsi</label>
-                            <div class="relative">
-                                <select name="provinsi_id" @change="loadCities($event.target.value)" required>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- PROVINSI -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Provinsi</label>
+                                <select name="provinsi_id"
+                                        @change="loadCities($event.target.value)"
+                                        class="w-full p-4 bg-gray-50 rounded-xl border font-bold">
+                                    
                                     <option value="">Pilih Provinsi</option>
-                                    <template x-for="prov in provinces" :key="prov.id">
-                                        <option :value="prov.id" x-text="prov.name" :selected="prov.id == selectedProvinceId"></option>
-                                    </template>
-                                </select>
 
-                                <select name="kota_kabupaten" required>
-                                    <option value="">Pilih Kota/Kabupaten</option>
-                                    <template x-for="city in cities" :key="city.id">
-                                        <option :value="city.name" x-text="city.name" :selected="city.name == selectedCity"></option>
+                                    <template x-for="prov in provinces" :key="prov.code">
+                                        <option :value="prov.code" x-text="prov.name"></option>
                                     </template>
-                                </select>
-                                <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                            </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Kota/Kabupaten</label>
-                            <div class="relative">
-                                <select name="kota_kabupaten" x-model="selectedCity" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">
-                                    <option value="" disabled>Pilih Kota/Kabupaten</option>
-                                    <template x-for="city in (wilayahData[selectedProvince] || [])" :key="city">
-                                        <option :value="city" x-text="city" :selected="city === selectedCity"></option>
+                                </select>
+                            </div>
+
+                            <!-- KOTA -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Kota / Kabupaten</label>
+                                <select name="kota_kabupaten"
+                                        class="w-full p-4 bg-gray-50 rounded-xl border font-bold">
+                                    
+                                    <option value="">Pilih Kota</option>
+
+                                    <template x-for="city in cities" :key="city.code">
+                                        <option :value="city.name" x-text="city.name"></option>
                                     </template>
-                                </select>
-                                <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                            </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Kota/Kabupaten</label>
-                            <div class="relative">
-                                <select name="kota_kabupaten" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Pilih Kota/Kabupaten</option>
-                                    @foreach(['Padang', 'Pekanbaru', 'Jambi'] as $kota)
-                                        <option value="{{ $kota }}" {{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') == $kota ? 'selected' : '' }}>
-                                            {{ $kota }}
-                                        </option>
-                                    @endforeach
                                 </select>
-                                <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                             </div>
+
                         </div>
-                    </div>
                 </section>
 
                 <section>
@@ -402,28 +388,21 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('formulirApp', () => ({
                 currentStep: 4,
-                provinces: [],
-    cities: [],
-    selectedProvinceId: '{{ old('provinsi_id', $pendaftar->provinsi_id ?? '') }}',
-    selectedCity: '{{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') }}',
+                    provinces: [],
+                    cities: [],
 
-    async init() {
-        // 1. Ambil data semua provinsi
-        const res = await fetch('/data/provinsi.json');
-        this.provinces = await res.json();
+                    async init() {
+                        // Mengambil data provinsi dari public/data/provinsi.json
+                        const res = await fetch('/data/provinsi.json');
+                        this.provinces = await res.json();
+                    },
 
-        // 2. Jika sudah ada provinsi terpilih saat edit, langsung load kotanya
-        if (this.selectedProvinceId) {
-            this.loadCities(this.selectedProvinceId);
-        }
-    },
-
-    async loadCities(provinceId) {
-        this.selectedProvinceId = provinceId;
-        // Load file JSON kota berdasarkan ID (misal: 11.json)
-        const res = await fetch(`/data/kabkota/${provinceId}.json`);
-        this.cities = await res.json();
-    }
+                    async loadCities(provinceId) {
+                        if (!provinceId) { this.cities = []; return; }
+                        // Mengambil data kota dari public/data/kabkota/{id}.json
+                        const res = await fetch(`/data/kabkota/${provinceId}.json`);
+                        this.cities = await res.json();
+            }
                 // State untuk menyimpan nama file yang diunggah
                 files: {
                     foto: null,
