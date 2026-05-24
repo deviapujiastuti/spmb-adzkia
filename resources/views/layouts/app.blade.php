@@ -132,5 +132,11 @@
     <script>
         feather.replace();
     </script>
+<script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            feather.replace();
+        });
+    </script>
 </body>
 </html>

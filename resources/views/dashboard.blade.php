@@ -22,12 +22,13 @@
                     Daftar Sekarang
                 </a>
                 <button class="px-8 py-4 text-adzkia-dark text-[15px] font-bold rounded-full flex items-center gap-2 hover:bg-gray-100 transition-colors">
-                    Unduh Brosur <i data-feather="arrow-right" class="w-4 h-4"></i>
+                    Unduh Brosur 
+                    <i data-feather="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
         <div class="w-1/2 relative flex justify-end">
-            <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+            <img src="{{ asset('images/gedung-adzkia.png') }}" 
                  class="w-[85%] h-[580px] object-cover rounded-[2.5rem] shadow-xl" alt="Kampus">
             
             <div class="absolute bottom-10 left-4 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 border border-gray-100 pr-8">
@@ -42,7 +43,7 @@
         </div>
     </main>
 
-    <section class="px-16 py-24 bg-white flex items-center justify-between">
+<section class="px-16 py-24 bg-white flex items-center justify-between" x-data="{ openVideo: false }">
         <div class="w-5/12 pr-12">
             <h2 class="text-[2.2rem] font-extrabold text-adzkia-dark leading-tight mb-5">
                 Eksplorasi Kampus Kami
@@ -56,16 +57,26 @@
                 </p>
             </div>
         </div>
+
         <div class="w-7/12 flex justify-end">
-            <div class="relative w-full max-w-[650px] h-[360px] rounded-[2rem] overflow-hidden shadow-2xl group cursor-pointer">
-                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+            <div @click="openVideo = true" class="relative w-full max-w-[650px] h-[360px] rounded-[2rem] overflow-hidden shadow-2xl group cursor-pointer">
+                <img src="https://i.ytimg.com/vi/q-r5HNQrCG0/maxresdefault.jpg" 
                      class="w-full h-full object-cover transition duration-700 group-hover:scale-105" 
-                     alt="Video Kampus">
+                     alt="Video Profil Adzkia">
                 <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-500 flex items-center justify-center">
                     <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
                         <div class="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-adzkia-dark border-b-[8px] border-b-transparent ml-1"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div x-show="openVideo" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-6" @click.away="openVideo = false">
+            <div class="relative w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
+                <button @click="openVideo = false" class="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 rounded-full text-white">
+                    <i data-feather="x"></i>
+                </button>
+                <iframe class="w-full h-full" src="https://www.youtube.com/embed/q-r5HNQrCG0?" allow="fullscreen" allowfullscreen></iframe>
             </div>
         </div>
     </section>
@@ -391,62 +402,62 @@
         </div>
     </section>
 
-    <section id="kontak" class="px-16 py-20 bg-white">
-        <div class="grid md:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
-            <div class="space-y-12 pr-8">
-                <div>
-                    <h2 class="text-4xl font-extrabold text-adzkia-dark tracking-tight mb-5">Hubungi Kami</h2>
-                    <p class="text-gray-500 font-medium leading-relaxed text-[15px]">
-                        Tim admisi kami siap membantu menjawab pertanyaan Anda seputar proses pendaftaran, jadwal seleksi, hingga beasiswa. Jangan ragu untuk menghubungi kami melalui kontak di bawah ini.
-                    </p>
-                </div>
-                <div class="space-y-8">
-                    <div class="flex gap-6 items-start group cursor-pointer">
-                        <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
-                            <i data-feather="map-pin" class="text-adzkia-badge-txt group-hover:text-white transition-colors duration-300"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Alamat Kampus</h4>
-                            <p class="text-gray-500 text-[14px] font-medium leading-relaxed">
-                                Jl. Raya Taratak Paneh No.7, Korong Gadang, Kec. Kuranji,<br>Kota Padang, Sumatera Barat 25147
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex gap-6 items-start group cursor-pointer">
-                        <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
-                            <i data-feather="phone" class="text-adzkia-badge-txt group-hover:text-white transition-colors duration-300"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Telepon / WhatsApp</h4>
-                            <p class="text-gray-500 text-[14px] font-medium">(0751) 482121 / +62 812-3456-7890</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-6 items-start group cursor-pointer">
-                        <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
-                            <i data-feather="mail" class="text-adzkia-badge-txt group-hover:text-white transition-colors duration-300"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Email Admisi</h4>
-                            <p class="text-gray-500 text-[14px] font-medium">pmb@adzkia.ac.id</p>
-                        </div>
-                    </div>
-                </div>
+<section id="kontak" class="px-16 py-20 bg-white">
+    <div class="grid md:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+        <div class="space-y-12 pr-8">
+            <div>
+                <h2 class="text-4xl font-extrabold text-adzkia-dark tracking-tight mb-5">Hubungi Kami</h2>
+                <p class="text-gray-500 font-medium leading-relaxed text-[15px]">
+                    Tim admisi kami siap membantu menjawab pertanyaan Anda seputar proses pendaftaran, jadwal seleksi, hingga beasiswa. Jangan ragu untuk menghubungi kami melalui kontak di bawah ini.
+                </p>
             </div>
-            <div class="relative w-full h-[450px] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-gray-50 group">
-                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80" 
-                     alt="Peta Lokasi" 
-                     class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105">
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <div class="bg-adzkia-dark text-white text-[12px] font-extrabold px-5 py-2.5 rounded-xl mb-3 shadow-xl whitespace-nowrap relative">
-                        Universitas Adzkia
-                        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-adzkia-dark rotate-45"></div>
-                    </div>
-                    <div class="w-16 h-16 bg-adzkia-badge-txt text-white rounded-full flex items-center justify-center shadow-2xl ring-8 ring-adzkia-badge-txt/30 animate-bounce cursor-pointer">
-                        <i data-feather="map-pin" class="w-7 h-7"></i>
+            
+            <div class="space-y-8">
+                <div class="flex gap-6 items-start group cursor-pointer">
+                    <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
+                        <i data-feather="map-pin" class="text-adzkia-badge-txt group-hover:text-white w-5 h-5 transition-colors duration-300"></i>                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Alamat Kampus</h4>
+                        <p class="text-gray-500 text-[14px] font-medium leading-relaxed">
+                            Jl. Raya Taratak Paneh No.7, Korong Gadang, Kec. Kuranji,<br>Kota Padang, Sumatera Barat 25147
+                        </p>
                     </div>
                 </div>
+
+                <a href="https://wa.me/6281234567890" target="_blank" class="flex gap-6 items-start group cursor-pointer">
+                    <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
+                        <i data-feather="phone" class="text-adzkia-badge-txt group-hover:text-white transition-colors duration-300"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Telepon / WhatsApp</h4>
+                        <p class="text-gray-500 text-[14px] font-medium">(0751) 482121 / +62 812-3456-7890</p>
+                    </div>
+                </a>
+
+                <a href="mailto:pmb@adzkia.ac.id" class="flex gap-6 items-start group cursor-pointer">
+                    <div class="w-12 h-12 bg-adzkia-badge-bg rounded-2xl flex items-center justify-center shrink-0 mt-1 group-hover:bg-adzkia-dark transition-colors duration-300">
+                        <i data-feather="mail" class="text-adzkia-badge-txt group-hover:text-white transition-colors duration-300"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-adzkia-dark text-lg mb-1">Email Admisi</h4>
+                        <p class="text-gray-500 text-[14px] font-medium">pmb@adzkia.ac.id</p>
+                    </div>
+                </a>
             </div>
         </div>
-    </section>
+
+        <div class="relative w-full h-[450px] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-gray-50">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.2885994508493!2d100.3770451740926!3d-0.9167230353457193!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2fd4b82d499292e1%3A0x6d5e751d3844f128!2sUniversitas%20Adzkia!5e0!3m2!1sid!2sid!4v1716556543210!5m2!1sid!2sid" 
+                width="100%" 
+                height="100%" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</section>
 
 @endsection

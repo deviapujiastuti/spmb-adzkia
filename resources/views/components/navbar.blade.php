@@ -1,10 +1,8 @@
 <nav x-data="navbarData()" @scroll.window="onScroll()" class="flex items-center justify-between px-16 py-6 bg-adzkia-bg sticky top-0 z-40 shadow-sm transition-all duration-300">
     
-    <a href="/" class="flex items-center gap-2 text-2xl font-extrabold text-adzkia-dark cursor-pointer hover:opacity-80 transition-opacity">
-        <div class="w-8 h-10 bg-orange-500 rounded-b-xl rounded-t-sm flex items-end justify-center pb-1">
-            <div class="w-4 h-4 bg-white rounded-full"></div>
-        </div>
-        <span>SPMB ADZKIA</span>
+<a href="/" class="flex items-center gap-2">
+        <img src="{{ asset('images/logo-adzkia.png') }}" alt="Logo Universitas Adzkia" class="h-10 w-auto">
+        <span class="text-xl font-extrabold text-adzkia-dark">SPMB Universitas Adzkia</span>
     </a>
 
     <div class="hidden lg:flex items-center gap-7 text-[14px] font-bold text-gray-500">
