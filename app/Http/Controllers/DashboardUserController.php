@@ -133,6 +133,10 @@ public function dashboardUser()
 
 public function simpanBiodata(Request $request)
     {
+        $pendaftarId = session('pendaftar_id');
+        $pendaftar = \App\Models\DataPendaftar::find($pendaftarId);
+
+        // 1. Validasi: File menjadi 'nullable' jika user sedang EDIT (file lama sudah ada)
         $request->validate([
             'nama_lengkap'      => 'required|string|max:255',
             'nik'               => 'required|string|max:20',
@@ -141,30 +145,42 @@ public function simpanBiodata(Request $request)
             'pilihan_jurusan_2' => 'required|string|different:pilihan_jurusan_1',
             'provinsi'          => 'required|string',
             'kota_kabupaten'    => 'required|string',
-            'pas_foto'          => 'required|file|image|max:2048',
-            'scan_ktp'          => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'ijazah_skl'        => 'required|file|mimes:pdf,jpg,png|max:2048',
+            'pas_foto'          => ($pendaftar->pas_foto ? 'nullable' : 'required') . '|file|image|max:2048',
+            'scan_ktp'          => ($pendaftar->scan_ktp ? 'nullable' : 'required') . '|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'ijazah_skl'        => ($pendaftar->ijazah_skl ? 'nullable' : 'required') . '|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $pathFoto   = $request->file('pas_foto')->store('dokumen/foto', 'public');
-        $pathKtp    = $request->file('scan_ktp')->store('dokumen/ktp', 'public');
-        $pathIjazah = $request->file('ijazah_skl')->store('dokumen/ijazah', 'public');
-
-        $pendaftarId = session('pendaftar_id');
-        $pendaftar = \App\Models\DataPendaftar::find($pendaftarId);
-
+        // 2. Simpan SEMUA field ke database (Termasuk field baru)
         $pendaftar->update([
             'nama_lengkap'      => $request->nama_lengkap,
             'nik'               => $request->nik,
+            'agama'             => $request->agama,
+            'tempat_lahir'      => $request->tempat_lahir,
+            'tanggal_lahir'     => $request->tanggal_lahir,
             'gender'            => $request->gender,
-            'pilihan_jurusan_1' => $request->pilihan_jurusan_1,
-            'pilihan_jurusan_2' => $request->pilihan_jurusan_2,
+            'email'             => $request->email,
+            'no_whatsapp'       => $request->no_whatsapp,
+            'alamat_rumah'      => $request->alamat_rumah,
             'provinsi'          => $request->provinsi,
             'kota_kabupaten'    => $request->kota_kabupaten,
-            'pas_foto'          => $pathFoto,
-            'scan_ktp'          => $pathKtp,
-            'ijazah_skl'        => $pathIjazah,
+            'sekolah_asal'      => $request->sekolah_asal,
+            'jurusan_sma'       => $request->jurusan_sma,
+            'tahun_lulus'       => $request->tahun_lulus,
+            'nilai_akhir'       => $request->nilai_akhir,
+            'pilihan_jurusan_1' => $request->pilihan_jurusan_1,
+            'pilihan_jurusan_2' => $request->pilihan_jurusan_2,
         ]);
+
+        // 3. Simpan file HANYA jika ada file baru yang diunggah
+        if ($request->hasFile('pas_foto')) {
+            $pendaftar->update(['pas_foto' => $request->file('pas_foto')->store('dokumen/foto', 'public')]);
+        }
+        if ($request->hasFile('scan_ktp')) {
+            $pendaftar->update(['scan_ktp' => $request->file('scan_ktp')->store('dokumen/ktp', 'public')]);
+        }
+        if ($request->hasFile('ijazah_skl')) {
+            $pendaftar->update(['ijazah_skl' => $request->file('ijazah_skl')->store('dokumen/ijazah', 'public')]);
+        }
 
         return redirect()->route('konfirmasi-data', $pendaftar->id)->with('success', 'Biodata berhasil disimpan!');
     }

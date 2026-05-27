@@ -184,8 +184,7 @@
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Provinsi</label>
                             <div class="relative">
-                                <select name="provinsi" @change="loadCities($event.target.value)" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Pilih Provinsi</option>
+                                <select name="provinsi" x-model="selectedProv" @change="loadCities(selectedProv)" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">                                    <option value="" disabled selected>Pilih Provinsi</option>
                                     <template x-for="prov in provinces" :key="prov.code">
                                         <option :value="prov.code" x-text="prov.name"></option>
                                     </template>
@@ -197,8 +196,7 @@
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Kota / Kabupaten</label>
                             <div class="relative">
-                                <select name="kota_kabupaten" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Pilih Kota</option>
+                                <select name="kota_kabupaten" x-model="selectedCity" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer">                                    <option value="" disabled selected>Pilih Kota</option>
                                     <template x-for="city in cities" :key="city.code">
                                         <option :value="city.name" x-text="city.name"></option>
                                     </template>
@@ -378,29 +376,34 @@
     </footer>
 
 <script>
-        document.addEventListener('alpine:init', () => {
+document.addEventListener('alpine:init', () => {
             Alpine.data('formulirApp', () => ({
-                currentStep: 4,
-                provinces: [],
-                cities: [],
-                
-                files: {
-                    foto: null,
-                    ktp: null,
-                    ijazah: null
-                },
-
                 steps: [
                     { id: 1, title: 'Pendaftaran' }, { id: 2, title: 'Biaya' },
                     { id: 3, title: 'Validasi' }, { id: 4, title: 'Biodata' },
                     { id: 5, title: 'Dokumen' }, { id: 6, title: 'Ujian' }, { id: 7, title: 'Hasil' }
                 ],
+                currentStep: 4,
+                provinces: [],
+                cities: [],
+                
+                // Tambahkan dua baris ini untuk mengingat pilihan database
+                selectedProv: '{{ old('provinsi', $pendaftar->provinsi ?? '') }}',
+                selectedCity: '{{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') }}',
+                
+                files: { foto: null, ktp: null, ijazah: null },
+                steps: [ /* ... isi steps tetap sama ... */ ],
 
                 async init() {
                     try {
                         const res = await fetch('/data/provinsi.json');
                         const json = await res.json();
                         this.provinces = json.data || [];
+                        
+                        // Jika dalam mode EDIT (Provinsi sudah ada), load kotanya otomatis
+                        if (this.selectedProv) {
+                            await this.loadCities(this.selectedProv);
+                        }
                     } catch (error) {
                         console.error('Gagal memuat data provinsi:', error);
                     }
@@ -449,7 +452,7 @@
                 }
             }));
         });
-
+                
         // Initialize Feather Icons
         document.addEventListener('DOMContentLoaded', () => {
             feather.replace();

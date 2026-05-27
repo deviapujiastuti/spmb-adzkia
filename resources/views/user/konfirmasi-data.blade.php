@@ -75,17 +75,23 @@
             
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($pendaftar->nama_lengkap) }}&background=F1F5F9&color=1e293b&size=128" alt="Foto Profil" class="w-24 h-24 rounded-2xl mb-4 shadow-sm border border-gray-100">
+                    
+                    <img src="{{ $pendaftar->pas_foto ? asset('storage/' . $pendaftar->pas_foto) : 'https://ui-avatars.com/api/?name=' . urlencode($pendaftar->nama_lengkap) . '&background=F1F5F9&color=1e293b&size=128' }}" 
+                         alt="Foto Profil" class="w-24 h-24 rounded-2xl mb-4 shadow-sm border border-gray-100 object-cover">
                      
                     <h2 class="text-2xl font-black text-adzkia-dark mb-1">{{ $pendaftar->nama_lengkap }}</h2>
-                    <p class="text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-6">Candidate ID: #{{ $pendaftar->id_pendaftaran }}</p>
+                    <p class="text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-6">Candidate ID: #{{ $pendaftar->no_pendaftaran ?? $pendaftar->id }}</p>
     
                     <div class="w-full bg-adzkia-blue rounded-2xl p-6 relative overflow-hidden shadow-lg shadow-adzkia-blue/20">
                         <div class="absolute top-0 right-0 p-4 opacity-10">
                             <i data-feather="book-open" class="w-20 h-20 text-white"></i>
                         </div>
-                        <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-1 relative z-10 text-left">Program Studi Pilihan</p>
-                        <h3 class="text-xl font-extrabold text-white relative z-10 text-left">{{ $pendaftar->pilihan_jurusan_1 ?? 'Data Jurusan Kosong' }}</h3>
+                        
+                        <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-1 relative z-10 text-left">Pilihan Jurusan 1</p>
+                        <h3 class="text-lg font-extrabold text-white relative z-10 text-left mb-4 leading-tight">{{ $pendaftar->pilihan_jurusan_1 ?? '-' }}</h3>
+                        
+                        <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-1 relative z-10 text-left">Pilihan Jurusan 2</p>
+                        <h3 class="text-lg font-extrabold text-white relative z-10 text-left leading-tight">{{ $pendaftar->pilihan_jurusan_2 ?? '-' }}</h3>
                     </div>
                 </div>
 
@@ -103,7 +109,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group">
-                        <a href="{{ route('edit-biodata', $pendaftar->id) }}" 
+                        <a href="{{ route('pendaftaran.biodata') }}" 
                             class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">
                             Edit
                         </a>
@@ -138,7 +144,7 @@
                     </div>
 
                     <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group">
-                        <a href="{{ route('edit-biodata', $pendaftar->id) }}" 
+                        <a href="{{ route('pendaftaran.biodata') }}" 
                             class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">
                             Edit
                         </a>
@@ -163,7 +169,7 @@
                     </div>
 
                     <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group md:col-span-2 lg:col-span-1">
-                        <a href="{{ route('edit-biodata', $pendaftar->id) }}" 
+                        <a href="{{ route('pendaftaran.biodata') }}" 
                             class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">
                             Edit
                         </a>
@@ -192,7 +198,7 @@
                     <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group md:col-span-2 lg:col-span-1">
                         <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">ID Database: {{ $pendaftar->id }}</p>
                         
-                        <a href="{{ route('edit-biodata', $pendaftar->id) }}" 
+                        <a href="{{ route('pendaftaran.biodata') }}" 
                             class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">
                             Edit
                         </a>
@@ -200,20 +206,21 @@
                             <i data-feather="folder" class="w-4 h-4 text-adzkia-blue"></i>
                             <h3 class="text-[15px] font-extrabold text-adzkia-dark">Dokumen</h3>
                         </div>
+                        
                         <div class="flex gap-4">
-                            <a href="{{ asset('storage/dokumen/foto/' . $pendaftar->pas_foto) }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
+                            <a href="{{ $pendaftar->pas_foto ? asset('storage/' . $pendaftar->pas_foto) : '#' }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
                                 <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 border border-gray-100 group-hover/doc:border-adzkia-blue group-hover/doc:text-adzkia-blue transition-colors">
                                     <i data-feather="image" class="w-5 h-5"></i>
                                 </div>
                                 <p class="text-[9px] font-bold text-gray-400 group-hover/doc:text-adzkia-blue transition-colors">Foto</p>
                             </a>
-                            <a href="{{ asset('storage/dokumen/ktp/' . $pendaftar->scan_ktp) }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
+                            <a href="{{ $pendaftar->scan_ktp ? asset('storage/' . $pendaftar->scan_ktp) : '#' }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
                                 <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 border border-gray-100 group-hover/doc:border-adzkia-blue group-hover/doc:text-adzkia-blue transition-colors">
                                     <i data-feather="file-text" class="w-5 h-5"></i>
                                 </div>
                                 <p class="text-[9px] font-bold text-gray-400 group-hover/doc:text-adzkia-blue transition-colors">KTP</p>
                             </a>
-                            <a href="{{ asset('storage/dokumen/ijazah/' . $pendaftar->ijazah_skl) }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
+                            <a href="{{ $pendaftar->ijazah_skl ? asset('storage/' . $pendaftar->ijazah_skl) : '#' }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
                                 <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 border border-gray-100 group-hover/doc:border-adzkia-blue group-hover/doc:text-adzkia-blue transition-colors">
                                     <i data-feather="award" class="w-5 h-5"></i>
                                 </div>
@@ -254,13 +261,13 @@
                         <button type="submit"
                                 :disabled="!canProceed"
                                 class="w-full py-4 rounded-2xl font-black text-[15px] transition-all"
-                                :class="canProceed ? 'bg-adzkia-red text-white hover:bg-red-700 shadow-xl shadow-red-600/20 active:scale-[0.98]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+                                :class="canProceed ? 'bg-adzkia-blue text-white hover:bg-blue-700 shadow-xl shadow-blue-600/20 active:scale-[0.98]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
                             Konfirmasi & Kirim Data
                         </button>
                     </form>
                     
-                    <a href="{{ route('pendaftaran.biodata', $pendaftar->id) }}" class="text-[13px] font-extrabold text-gray-500 hover:text-adzkia-blue transition-colors py-2">
-                        Kembali
+                    <a href="{{ route('pendaftaran.biodata') }}" class="text-[13px] font-extrabold text-gray-500 hover:text-adzkia-blue transition-colors py-2">
+                        Kembali Edit Formulir
                     </a>
                 </div>
             </div>
@@ -291,22 +298,13 @@
                     { id: 2, title: 'Biaya Pendaftaran' },
                     { id: 3, title: 'Validasi Pembayaran' },
                     { id: 4, title: 'Biodata' },
-                    { id: 5, title: 'Daftar Ulang' }, // Berdasarkan desain gambar, Step 5 ditulis "Daftar Ulang" di bar atas
+                    { id: 5, title: 'Daftar Ulang' },
                     { id: 6, title: 'Validasi' },
                     { id: 7, title: 'Selesai' }
                 ],
 
-                // Tombol Konfirmasi hanya aktif jika kedua checkbox bernilai true
                 get canProceed() {
                     return this.agreements.dataCorrect && this.agreements.termsRead;
-                },
-
-                submitFinal() {
-                    if (this.canProceed) {
-                        alert("Data telah dikonfirmasi dan dikirim ke Admin untuk proses Validasi Akhir!");
-                        // Arahkan ke halaman berikutnya (misal: sukses daftar / validasi admin)
-                        window.location.href = '/validasi-akhir';
-                    }
                 }
             }));
         });

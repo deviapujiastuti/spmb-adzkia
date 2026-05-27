@@ -11,7 +11,7 @@ class DataPendaftar extends Authenticatable
 
     protected $table = 'data_pendaftars';
 
-    protected $fillable = [
+    protected $guarded = [
         'no_pendaftaran',
         'jalur_pendaftaran',
         'nama_lengkap',
