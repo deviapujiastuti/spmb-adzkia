@@ -5,7 +5,7 @@
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-brand-dark tracking-tight mb-2">Manajemen Divisi & Staf</h1>
+            <h1 class="text-3xl font-extrabold text-brand-dark tracking-tight mb-2">Manajemen Divisi & Admin</h1>
             <p class="text-brand-gray text-[14px] font-medium">
                 Atur akun dan hak akses staf admin SPMB Universitas Adzkia.
             </p>

@@ -28,26 +28,16 @@ class DashboardUserController extends Controller
         return view('user.pembayaran', compact('mahasiswa', 'bankTransfer', 'virtualAccount', 'eWallet', 'batasWaktu'));
     }
 
-    public function pembayaranIndex()
+public function pembayaranIndex()
     {
-        $pendaftarId = session('pendaftar_id');
-        if (!$pendaftarId) return redirect('/login');
+        // Ambil data pendaftar berdasarkan sesi yang sedang login
+        $pendaftar = \App\Models\DataPendaftar::find(session('pendaftar_id'));
         
-        $mahasiswa = DataPendaftar::find($pendaftarId);
+        if (!$pendaftar) {
+            return redirect('/login')->with('error', 'Sesi Anda telah habis. Silakan login kembali.');
+        }
 
-        $virtualAccount = [
-            (object)['nama_provider' => 'MANDIRI', 'nama_bank_lengkap' => 'Bank Mandiri', 'nomor_tujuan' => '1234567890', 'atas_nama' => 'Universitas Adzkia'],
-            (object)['nama_provider' => 'BCA', 'nama_bank_lengkap' => 'Bank BCA', 'nomor_tujuan' => '0987654321', 'atas_nama' => 'Universitas Adzkia'],
-        ];
-
-        $bankTransfer = [
-            (object)['nama_provider' => 'BCA_MANUAL', 'nama_bank_lengkap' => 'BCA (Transfer Manual)', 'nomor_tujuan' => '0987654321', 'atas_nama' => 'Universitas Adzkia'],
-            (object)['nama_provider' => 'BNI_MANUAL', 'nama_bank_lengkap' => 'BNI (Transfer Manual)', 'nomor_tujuan' => '1122334455', 'atas_nama' => 'Universitas Adzkia'],
-        ];
-
-        $batasWaktu = Carbon::now()->addDays(1)->format('d F Y, H:i');
-
-        return view('user.pembayaran', compact('virtualAccount', 'bankTransfer', 'batasWaktu', 'mahasiswa'));
+        return view('user.pembayaran', compact('pendaftar'));
     }
 
     public function prosesPembayaran(Request $request)
@@ -98,20 +88,35 @@ public function dashboardUser()
         return view('user.validasi-pembayaran', compact('pendaftar'));
     }
 
-    public function prosesUploadBukti(Request $request)
-        {
-            $request->validate(['bukti_bayar' => 'required|image|mimes:jpeg,png,jpg|max:2048']);
-            $pendaftar = \App\Models\DataPendaftar::find(session('pendaftar_id'));
-            
-            $path = $request->file('bukti_bayar')->store('bukti_pembayaran', 'public');
-            
-            $pendaftar->update([
-                'bukti_bayar' => $path,
-                'status_pembayaran' => 'Menunggu Validasi' // KUNCI: Status ini mengunci agar admin harus melakukan verifikasi manual
-            ]);
+public function prosesUploadBukti(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048', // Maksimal 2MB, hanya gambar
+        ], [
+            'bukti_pembayaran.required' => 'Anda harus memilih file gambar bukti pembayaran.',
+            'bukti_pembayaran.image' => 'File harus berupa gambar (JPG/PNG).',
+            'bukti_pembayaran.max' => 'Ukuran gambar maksimal adalah 2MB.'
+        ]);
 
-            return redirect()->route('pendaftaran.validasi')->with('success', 'Bukti berhasil diunggah!');
+        $pendaftar = \App\Models\DataPendaftar::find(session('pendaftar_id'));
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            $file = $request->file('bukti_pembayaran');
+            
+            // Buat nama file unik: ID-Pendaftar_Timestamp_NamaAsli
+            $filename = $pendaftar->id . '_' . time() . '_' . $file->getClientOriginalName();
+            
+            // Simpan ke folder public/uploads/bukti_bayar
+            $file->move(public_path('uploads/bukti_bayar'), $filename);
+            
+            // Update database
+            $pendaftar->bukti_pembayaran = $filename;
+            $pendaftar->status_pembayaran = 'Menunggu Validasi';
+            $pendaftar->save();
         }
+
+        return back()->with('success', 'Bukti pembayaran berhasil diunggah! Harap tunggu proses validasi oleh Admin.');
+    }
 
     public function biodataIndex()
     {

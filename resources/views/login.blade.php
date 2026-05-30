@@ -80,29 +80,31 @@
                 </div>
                 @endif
 
-                {{-- Alert Error jika Validasi Login Gagal --}}
-                @if($errors->has('login_error'))
-                    <div class="mb-6 p-4 bg-red-50 border-l-4 border-adzkia-red rounded-r-xl text-sm text-red-700 font-semibold shadow-sm">
-                        {{ $errors->first('login_error') }}
+                {{-- Alert Error jika Validasi Login Gagal atau Akses Ditolak --}}
+                @if($errors->any() || session('error'))
+                    <div class="mb-6 p-4 bg-red-50 border-l-4 border-adzkia-red rounded-r-xl text-sm text-red-700 font-semibold shadow-sm flex items-start gap-3">
+                        <i data-feather="alert-circle" class="w-5 h-5 shrink-0"></i>
+                        <span>{{ $errors->first() ?: session('error') }}</span>
                     </div>
                 @endif
 
-                <form action="{{ route('login.proses') }}" method="POST" class="space-y-6">
+                {{-- FORM ASLI MENGARAH KE AUTH CONTROLLER --}}
+                <form action="{{ route('login.post') }}" method="POST">
                     @csrf
                     
                     <div>
                         <label class="block text-[11px] font-extrabold text-gray-500 uppercase tracking-widest mb-2">
-                            Email / No. Pendaftaran
+                            No. Registrasi Pendaftar
                         </label>
                         <input type="text" 
                                name="login_input" 
                                required 
                                value="{{ old('login_input', session('username')) }}"
-                               placeholder="nama@email.com atau REG-2026-XXXX" 
+                               placeholder="REG-2026-0000" 
                                class="w-full bg-gray-50 text-adzkia-dark px-5 py-4 rounded-xl border-2 border-transparent focus:bg-white focus:border-adzkia-blue focus:ring-0 outline-none transition-all font-medium placeholder-gray-400 text-[14px]">
                     </div>
 
-                    <div>
+                    <div class="mt-6">
                         <div class="flex justify-between items-center mb-2">
                             <label class="block text-[11px] font-extrabold text-gray-500 uppercase tracking-widest">
                                 Password
@@ -119,7 +121,7 @@
                                class="w-full bg-gray-50 text-adzkia-dark px-5 py-4 rounded-xl border-2 border-transparent focus:bg-white focus:border-adzkia-blue focus:ring-0 outline-none transition-all font-medium placeholder-gray-400 text-[14px]">
                     </div>
 
-                    <div class="flex items-center gap-3 pt-2 pb-4">
+                    <div class="flex items-center gap-3 pt-4 pb-6">
                         <input type="checkbox" id="remember" name="remember" class="w-4 h-4 rounded border-gray-300 text-adzkia-blue focus:ring-adzkia-blue cursor-pointer">
                         <label for="remember" class="text-[13px] font-medium text-gray-600 cursor-pointer hover:text-adzkia-dark">
                             Ingat Saya

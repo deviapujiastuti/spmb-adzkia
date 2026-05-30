@@ -1,19 +1,9 @@
-@if ($errors->any())
-    <div class="bg-red-50 border-l-4 border-adzkia-red p-4 mb-4 text-adzkia-red rounded-lg shadow-sm">
-        <ul class="font-bold text-sm">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Pendaftaran - SPMB Adzkia</title>
+    <title>Formulir Pendaftaran - Dasbor SPMB Adzkia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,8 +18,6 @@
                         'adzkia-blue': '#2c7ebd',
                         'adzkia-dark': '#1e293b',
                         'adzkia-badge-bg': '#eff6ff',
-                        'adzkia-badge-txt': '#2c7ebd',
-                        'adzkia-bg': '#FAFBFC',
                     }
                 }
             }
@@ -41,51 +29,68 @@
         textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-adzkia-bg antialiased text-adzkia-dark min-h-screen flex flex-col" x-data="formulirApp()">
+<body class="bg-gray-50 antialiased text-adzkia-dark min-h-screen flex flex-col" x-data="formulirApp()">
 
-    <nav class="w-full bg-white py-8 border-b border-gray-100 sticky top-0 z-50">
+    {{-- NAVBAR DASHBOARD USER --}}
+    <nav class="bg-white border-b border-gray-200 py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 z-30">
+        <a href="{{ route('dashboard.user') }}" class="flex items-center gap-3 group">
+            <img src="{{ asset('images/logo-adzkia.png') }}" alt="Logo" class="h-10 w-auto group-hover:scale-105 transition-transform">
+            <div class="hidden md:flex flex-col">
+                <span class="text-[16px] font-black text-adzkia-blue leading-none">Dasbor</span>
+                <span class="text-[12px] font-bold text-adzkia-red">Calon Mahasiswa</span>
+            </div>
+        </a>
+        
+        <div class="flex items-center gap-4 md:gap-6">
+            <a href="{{ route('dashboard.user') }}" class="flex items-center gap-2 text-[12px] md:text-[13px] font-bold text-gray-500 hover:text-adzkia-blue transition-colors bg-gray-50 px-4 py-2 rounded-lg">
+                <i data-feather="arrow-left" class="w-4 h-4"></i> Kembali ke Dasbor
+            </a>
+            <div class="hidden md:block w-px h-6 bg-gray-200"></div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden md:block">
+                    <p class="text-[13px] font-extrabold text-adzkia-dark">{{ session('nama_pendaftar') }}</p>
+                    <p class="text-[11px] font-bold text-gray-400">ID: {{ $pendaftar->no_pendaftaran ?? 'ID Kosong' }}</p>
+                </div>
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(session('nama_pendaftar')) }}&background=1e293b&color=fff" class="w-10 h-10 rounded-full border-2 border-gray-100">
+            </div>
+        </div>
+    </nav>
+
+    {{-- STEP PROGRESS TRACKER --}}
+    <div class="w-full bg-white py-6 border-b border-gray-100 z-20">
         <div class="max-w-5xl mx-auto px-6">
             <div class="flex items-center justify-between relative">
-                <div class="absolute top-5 left-0 w-full h-0.5 bg-gray-100 z-0"></div>
-                <div class="absolute top-5 left-0 h-0.5 bg-adzkia-blue z-0 transition-all duration-500" style="width: 50%;"></div>
-                
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0"></div>
                 <template x-for="step in steps" :key="step.id">
-                    <div class="relative z-10 flex flex-col items-center gap-3 w-20">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-[13px] transition-all duration-300"
-                             :class="{
-                                 'bg-adzkia-blue text-white': step.id < currentStep,
-                                 'bg-adzkia-red text-white shadow-lg shadow-red-600/30 scale-110 ring-4 ring-red-50': step.id === currentStep,
-                                 'bg-white border-2 border-gray-200 text-gray-300': step.id > currentStep
-                             }">
-                            <template x-if="step.id < currentStep">
-                                <i data-feather="check" class="w-5 h-5"></i>
-                            </template>
-                            <template x-if="step.id >= currentStep">
-                                <span x-text="step.id"></span>
-                            </template>
+                    <div class="relative z-10 flex flex-col items-center gap-2">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[13px] transition-all duration-300"
+                             :class="currentStep === step.id ? 'bg-adzkia-blue text-white shadow-lg shadow-adzkia-blue/30 scale-110' : (step.id < currentStep ? 'bg-green-500 text-white border-2 border-green-500' : 'bg-white border-2 border-gray-100 text-gray-400')">
+                            <span x-show="step.id < currentStep"><i data-feather="check" class="w-4 h-4"></i></span>
+                            <span x-show="step.id >= currentStep" x-text="step.id"></span>
                         </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-center"
-                              :class="step.id === currentStep ? 'text-adzkia-blue' : 'text-gray-400'"
+                        <span class="text-[9px] font-black uppercase tracking-widest hidden md:block" 
+                              :class="currentStep === step.id ? 'text-adzkia-blue' : (step.id < currentStep ? 'text-green-500' : 'text-gray-400')" 
                               x-text="step.title"></span>
                     </div>
                 </template>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
-        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-adzkia-dark/5 border border-gray-100">
+    <main class="flex-1 max-w-4xl mx-auto w-full px-6 py-10">
+        
+        {{-- JUDUL HALAMAN --}}
+        <div class="mb-8 text-center md:text-left">
+            <span class="inline-block px-3 py-1 bg-adzkia-badge-bg text-adzkia-blue rounded-lg text-[11px] font-black uppercase tracking-widest mb-3">STEP 04 / 07</span>
+            <h1 class="text-3xl font-black text-adzkia-dark tracking-tight">Formulir Biodata Diri</h1>
+            <p class="text-[14px] font-medium text-gray-500 mt-2">Lengkapi detail profil akademik dan data pribadi Anda dengan valid dan benar.</p>
+        </div>
+
+        <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100 mb-10">
             
-            <div class="mb-10 border-b border-gray-100 pb-8">
-                <h1 class="text-3xl font-black text-adzkia-blue tracking-tight mb-3">Step 4: Formulir Pendaftaran</h1>
-                <p class="text-[14px] font-medium text-gray-500 leading-relaxed">
-                    Lengkapi detail profil akademik dan data pribadi Anda untuk melanjutkan proses kurasi pendaftaran.
-                </p>
-            </div>
-
             <form action="{{ route('simpan-biodata') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="pendaftar_id" value="{{ $pendaftar->id }}">
+                <input type="hidden" name="pendaftar_id" value="{{ $pendaftar->id ?? '' }}">
                 
                 @if ($errors->any())
                     <div class="bg-red-50 border-l-4 border-adzkia-red p-4 mb-8 rounded-r-2xl">
@@ -98,6 +103,7 @@
                     </div>
                 @endif
                 
+                {{-- BAGIAN 1: DATA DIRI --}}
                 <section>
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-adzkia-badge-bg text-adzkia-blue rounded-xl flex items-center justify-center">
@@ -113,8 +119,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">NIK (National ID)</label>
-                            <input type="text" name="nik" value="{{ old('nik', $pendaftar->nik ?? '') }}" placeholder="16 digit nomor induk" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">NIK (Nomor Induk Kependudukan)</label>
+                            <input type="text" name="nik" value="{{ old('nik', $pendaftar->nik ?? '') }}" placeholder="16 digit NIK" required class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
                         
                         <div>
@@ -157,26 +163,28 @@
                     </div>
                 </section>
 
-<section>
-                    <div class="flex items-center gap-3 mb-6 mt-10">
+                <hr class="border-gray-100 my-10">
+
+                {{-- BAGIAN 2: KONTAK & ALAMAT --}}
+                <section>
+                    <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-adzkia-badge-bg text-adzkia-blue rounded-xl flex items-center justify-center">
                             <i data-feather="map-pin" class="w-5 h-5"></i>
                         </div>
-                        <h2 class="text-lg font-black text-adzkia-dark">Informasi Kontak & Wilayah</h2>
+                        <h2 class="text-lg font-black text-adzkia-dark">Kontak & Wilayah</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Email</label>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Email Aktif</label>
                             <input type="email" name="email" value="{{ old('email', $pendaftar->email ?? '') }}" placeholder="example@email.com" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
                         
                         <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">No. HP (WhatsApp)</label>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">No. HP / WhatsApp</label>
                             <input type="text" name="no_whatsapp" value="{{ old('no_whatsapp', $pendaftar->no_whatsapp ?? '') }}" placeholder="0812xxxx" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
 
-                        <!-- PROVINSI DAN KOTA (Dipindah Ke Atas Alamat) -->
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Provinsi</label>
                             <div class="relative">
@@ -203,36 +211,38 @@
                             </div>
                         </div>
 
-                        <!-- ALAMAT LENGKAP -->
                         <div class="md:col-span-2">
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Alamat Lengkap (Jl, RT/RW, Kecamatan)</label>
-                            <textarea name="alamat_rumah" rows="3" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark resize-none">{{ old('alamat_rumah', $pendaftar->alamat_rumah ?? '') }}</textarea>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Alamat Lengkap Rumah</label>
+                            <textarea name="alamat_rumah" rows="3" placeholder="Jl. Sudirman No 123, RT 01 RW 02, Kec. Padang Barat..." class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark resize-none">{{ old('alamat_rumah', $pendaftar->alamat_rumah ?? '') }}</textarea>
                         </div>
                     </div>
                 </section>
 
+                <hr class="border-gray-100 my-10">
+
+                {{-- BAGIAN 3: PENDIDIKAN --}}
                 <section>
-                    <div class="flex items-center gap-3 mb-6 mt-10">
+                    <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-adzkia-badge-bg text-adzkia-blue rounded-xl flex items-center justify-center">
-                            <i data-feather="book-open" class="w-5 h-5"></i>
+                            <i data-feather="book" class="w-5 h-5"></i>
                         </div>
-                        <h2 class="text-lg font-black text-adzkia-dark">Latar Belakang Pendidikan</h2>
+                        <h2 class="text-lg font-black text-adzkia-dark">Asal Pendidikan</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                         <div class="md:col-span-12">
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Asal Sekolah</label>
-                            <input type="text" name="sekolah_asal" value="{{ old('sekolah_asal', $pendaftar->sekolah_asal ?? '') }}" placeholder="SMAN / SMK / MA..." class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
+                            <input type="text" name="sekolah_asal" value="{{ old('sekolah_asal', $pendaftar->sekolah_asal ?? '') }}" placeholder="Contoh: SMAN 1 Padang" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
 
                         <div class="md:col-span-6">
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Jurusan</label>
-                            <input type="text" name="jurusan_sma" value="{{ old('jurusan_sma', $pendaftar->jurusan_sma ?? '') }}" placeholder="IPA / IPS / Teknik..." class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Jurusan di Sekolah</label>
+                            <input type="text" name="jurusan_sma" value="{{ old('jurusan_sma', $pendaftar->jurusan_sma ?? '') }}" placeholder="MIPA / IPS / RPL" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
 
                         <div class="md:col-span-3">
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Tahun Lulus</label>
-                            <input type="number" name="tahun_lulus" value="{{ old('tahun_lulus', $pendaftar->tahun_lulus ?? '') }}" placeholder="2023" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
+                            <input type="number" name="tahun_lulus" value="{{ old('tahun_lulus', $pendaftar->tahun_lulus ?? '') }}" placeholder="2024" class="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:border-adzkia-blue focus:bg-white transition-all font-bold text-[14px] text-adzkia-dark">
                         </div>
 
                         <div class="md:col-span-3">
@@ -242,20 +252,21 @@
                     </div>
                 </section>
         
+                {{-- BAGIAN 4: PRODI (Dalam Kotak Khusus Biru Muda) --}}
                 <section class="bg-[#F8FAFC] p-8 md:p-10 rounded-[2rem] border border-gray-100 my-10">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-white shadow-sm text-adzkia-blue rounded-xl flex items-center justify-center">
-                            <i data-feather="book-open" class="w-5 h-5"></i>
+                            <i data-feather="target" class="w-5 h-5"></i>
                         </div>
                         <h2 class="text-lg font-black text-adzkia-dark">Pilihan Program Studi</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Pilihan Jurusan 1</label>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Pilihan Jurusan 1 (Utama)</label>
                             <div class="relative">
                                 <select name="pilihan_jurusan_1" required class="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl outline-none focus:border-adzkia-blue transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer shadow-sm">
-                                    <option value="" disabled>Pilih Jurusan 1</option>
+                                    <option value="" disabled>Pilih Jurusan Utama</option>
                                     @foreach($prodis as $prodi)
                                         <option value="{{ $prodi->nama }}" {{ old('pilihan_jurusan_1', $pendaftar->pilihan_jurusan_1 ?? '') == $prodi->nama ? 'selected' : '' }}>
                                             {{ $prodi->nama }}
@@ -267,10 +278,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Pilihan Jurusan 2</label>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Pilihan Jurusan 2 (Cadangan)</label>
                             <div class="relative">
                                 <select name="pilihan_jurusan_2" required class="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl outline-none focus:border-adzkia-blue transition-all font-bold text-[14px] text-adzkia-dark appearance-none cursor-pointer shadow-sm">
-                                    <option value="" disabled>Pilih Jurusan 2</option>
+                                    <option value="" disabled>Pilih Jurusan Alternatif</option>
                                     @foreach($prodis as $prodi)
                                         <option value="{{ $prodi->nama }}" {{ old('pilihan_jurusan_2', $pendaftar->pilihan_jurusan_2 ?? '') == $prodi->nama ? 'selected' : '' }}>
                                             {{ $prodi->nama }}
@@ -283,24 +294,22 @@
                     </div>
                 </section>
 
-<section>
+                {{-- BAGIAN 5: UPLOAD BERKAS --}}
+                <section>
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 bg-adzkia-badge-bg text-adzkia-blue rounded-xl flex items-center justify-center">
                             <i data-feather="upload-cloud" class="w-5 h-5"></i>
                         </div>
-                        <h2 class="text-lg font-black text-adzkia-dark">Unggah Dokumen</h2>
+                        <h2 class="text-lg font-black text-adzkia-dark">Unggah Dokumen Syarat</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         
-                        <!-- PAS FOTO -->
                         <div class="border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all group overflow-hidden relative"
                             :class="!files.foto ? 'border-gray-200 cursor-pointer hover:border-adzkia-blue hover:bg-blue-50' : 'bg-gray-50 border-gray-300'"
                             @click="if(!files.foto) $refs.fileFoto.click()">
-                            
                             <input type="file" name="pas_foto" x-ref="fileFoto" @change="handleFileUpload($event, 'foto')" class="hidden" accept=".jpg,.png,.jpeg">
                             
-                            <!-- Saat Kosong -->
                             <div x-show="!files.foto" class="flex flex-col items-center">
                                 <i data-feather="camera" class="w-6 h-6 text-gray-400 mb-3 group-hover:text-adzkia-blue transition-colors"></i>
                                 <h4 class="text-[13px] font-extrabold text-adzkia-dark mb-1">Pas Foto 4x6</h4>
@@ -308,69 +317,55 @@
                                 <span class="text-[12px] font-black text-adzkia-blue underline underline-offset-2">Pilih File</span>
                             </div>
                             
-                            <!-- Saat Sudah Diunggah -->
                             <div x-show="files.foto" class="flex flex-col items-center w-full min-w-0" x-cloak>
                                 <div class="w-10 h-10 bg-adzkia-blue text-white rounded-full flex items-center justify-center mb-2 shrink-0">
                                     <i data-feather="check" class="w-5 h-5"></i>
                                 </div>
-                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" x-text="files.foto"></h4>
-                                
+                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center truncate" x-text="files.foto"></h4>
                                 <div class="flex gap-2 mt-3">
                                     @if(!empty($pendaftar->pas_foto))
                                     <a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" x-show="files.foto === 'Sudah Diunggah'" class="text-[11px] font-bold text-adzkia-blue bg-blue-100 px-3 py-1.5 rounded-lg hover:bg-blue-200 transition-colors" @click.stop>
                                         Lihat File
                                     </a>
                                     @endif
-                                    <button type="button" @click.stop="$refs.fileFoto.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">
-                                        Ganti
-                                    </button>
+                                    <button type="button" @click.stop="$refs.fileFoto.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">Ganti</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SCAN KTP -->
                         <div class="border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all group overflow-hidden relative"
                             :class="!files.ktp ? 'border-gray-200 cursor-pointer hover:border-adzkia-blue hover:bg-blue-50' : 'bg-gray-50 border-gray-300'"
                             @click="if(!files.ktp) $refs.fileKtp.click()">
-                            
                             <input type="file" name="scan_ktp" x-ref="fileKtp" @change="handleFileUpload($event, 'ktp')" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
                             
-                            <!-- Saat Kosong -->
                             <div x-show="!files.ktp" class="flex flex-col items-center">
                                 <i data-feather="credit-card" class="w-6 h-6 text-gray-400 mb-3 group-hover:text-adzkia-blue transition-colors"></i>
-                                <h4 class="text-[13px] font-extrabold text-adzkia-dark mb-1">Scan KTP</h4>
+                                <h4 class="text-[13px] font-extrabold text-adzkia-dark mb-1">Scan KTP/KK</h4>
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">PDF/JPG, Max 2MB</p>
                                 <span class="text-[12px] font-black text-adzkia-blue underline underline-offset-2">Pilih File</span>
                             </div>
 
-                            <!-- Saat Sudah Diunggah -->
                             <div x-show="files.ktp" class="flex flex-col items-center w-full min-w-0" x-cloak>
                                 <div class="w-10 h-10 bg-adzkia-blue text-white rounded-full flex items-center justify-center mb-2 shrink-0">
                                     <i data-feather="check" class="w-5 h-5"></i>
                                 </div>
-                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" x-text="files.ktp"></h4>
-                                
+                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center truncate" x-text="files.ktp"></h4>
                                 <div class="flex gap-2 mt-3">
                                     @if(!empty($pendaftar->scan_ktp))
                                     <a href="{{ asset('storage/' . $pendaftar->scan_ktp) }}" target="_blank" x-show="files.ktp === 'Sudah Diunggah'" class="text-[11px] font-bold text-adzkia-blue bg-blue-100 px-3 py-1.5 rounded-lg hover:bg-blue-200 transition-colors" @click.stop>
                                         Lihat File
                                     </a>
                                     @endif
-                                    <button type="button" @click.stop="$refs.fileKtp.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">
-                                        Ganti
-                                    </button>
+                                    <button type="button" @click.stop="$refs.fileKtp.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">Ganti</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- IJAZAH / SKL -->
                         <div class="border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all group overflow-hidden relative"
                             :class="!files.ijazah ? 'border-gray-200 cursor-pointer hover:border-adzkia-blue hover:bg-blue-50' : 'bg-gray-50 border-gray-300'"
                             @click="if(!files.ijazah) $refs.fileIjazah.click()">
-                            
                             <input type="file" name="ijazah_skl" x-ref="fileIjazah" @change="handleFileUpload($event, 'ijazah')" class="hidden" accept=".pdf">
                             
-                            <!-- Saat Kosong -->
                             <div x-show="!files.ijazah" class="flex flex-col items-center">
                                 <i data-feather="file-text" class="w-6 h-6 text-gray-400 mb-3 group-hover:text-adzkia-blue transition-colors"></i>
                                 <h4 class="text-[13px] font-extrabold text-adzkia-dark mb-1">Ijazah / SKL</h4>
@@ -378,22 +373,18 @@
                                 <span class="text-[12px] font-black text-adzkia-blue underline underline-offset-2">Pilih File</span>
                             </div>
 
-                            <!-- Saat Sudah Diunggah -->
                             <div x-show="files.ijazah" class="flex flex-col items-center w-full min-w-0" x-cloak>
                                 <div class="w-10 h-10 bg-adzkia-blue text-white rounded-full flex items-center justify-center mb-2 shrink-0">
                                     <i data-feather="check" class="w-5 h-5"></i>
                                 </div>
-                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" x-text="files.ijazah"></h4>
-                                
+                                <h4 class="text-[12px] font-extrabold text-adzkia-dark w-full px-2 text-center truncate" x-text="files.ijazah"></h4>
                                 <div class="flex gap-2 mt-3">
                                     @if(!empty($pendaftar->ijazah_skl))
                                     <a href="{{ asset('storage/' . $pendaftar->ijazah_skl) }}" target="_blank" x-show="files.ijazah === 'Sudah Diunggah'" class="text-[11px] font-bold text-adzkia-blue bg-blue-100 px-3 py-1.5 rounded-lg hover:bg-blue-200 transition-colors" @click.stop>
                                         Lihat File
                                     </a>
                                     @endif
-                                    <button type="button" @click.stop="$refs.fileIjazah.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">
-                                        Ganti
-                                    </button>
+                                    <button type="button" @click.stop="$refs.fileIjazah.click()" class="text-[11px] font-bold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-300 transition-colors">Ganti</button>
                                 </div>
                             </div>
                         </div>
@@ -402,29 +393,16 @@
 
                 <div class="pt-10 border-t border-gray-100 flex flex-col items-center gap-6 mt-10">
                     <div class="flex items-center gap-2 text-[12px] font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg w-full md:w-auto justify-center">
-                        <i data-feather="check-circle" class="w-4 h-4"></i> Data tersimpan otomatis
+                        <i data-feather="save" class="w-4 h-4"></i> Data otomatis tersimpan sebagai draft di browser Anda
                     </div>
 
-                    <button type="submit" class="w-full py-4 bg-adzkia-blue text-white rounded-2xl font-black text-[15px] hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
-                        Simpan & Lanjutkan
+                    <button type="submit" class="w-full py-4 bg-adzkia-blue text-white rounded-2xl font-black text-[15px] hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
+                        Simpan Biodata & Lanjutkan <i data-feather="arrow-right" class="w-4 h-4"></i>
                     </button>
-
-                    <a href="/validasi-pembayaran" class="text-[13px] font-extrabold text-gray-500 hover:text-adzkia-blue transition-colors py-2">
-                        Kembali
-                    </a>
                 </div>
             </form>
         </div>
     </main>
-
-    <footer class="w-full bg-adzkia-bg py-8 flex flex-col md:flex-row justify-center md:justify-between items-center gap-4 px-10 border-t border-gray-100">
-        <p class="text-[11px] font-bold text-gray-400">© 2026 Universitas Adzkia. All Rights Reserved.</p>
-        <div class="flex gap-8 text-[11px] font-bold text-gray-500">
-            <a href="#" class="hover:text-adzkia-blue transition-colors">Privacy Policy</a>
-            <a href="#" class="hover:text-adzkia-blue transition-colors">Contact Support</a>
-            <a href="#" class="hover:text-adzkia-blue transition-colors">Terms of Service</a>
-        </div>
-    </footer>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -432,21 +410,13 @@
                 currentStep: 4,
                 provinces: [],
                 cities: [],
-                
                 selectedProv: '{{ old('provinsi', $pendaftar->provinsi ?? '') }}',
                 selectedCity: '{{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') }}',
 
-files: {
-                    foto: '{{ !empty($pendaftar->pas_foto) ? basename($pendaftar->pas_foto) : "" }}',
-                    ktp: '{{ !empty($pendaftar->scan_ktp) ? basename($pendaftar->scan_ktp) : "" }}',
-                    ijazah: '{{ !empty($pendaftar->ijazah_skl) ? basename($pendaftar->ijazah_skl) : "" }}'
-                },
-
-                // Deteksi file baru yang diunggah (belum tersimpan di DB)
-                newUploads: {
-                    foto: false,
-                    ktp: false,
-                    ijazah: false
+                files: {
+                    foto: '{{ !empty($pendaftar->pas_foto) ? "Sudah Diunggah" : "" }}',
+                    ktp: '{{ !empty($pendaftar->scan_ktp) ? "Sudah Diunggah" : "" }}',
+                    ijazah: '{{ !empty($pendaftar->ijazah_skl) ? "Sudah Diunggah" : "" }}'
                 },
 
                 steps: [
@@ -458,30 +428,29 @@ files: {
                 async init() {
                     try {
                         const res = await fetch('/data/provinsi.json');
-                        const json = await res.json();
-                        this.provinces = json.data || [];
-                        
-                        if (this.selectedProv) {
-                            await this.loadCities(this.selectedProv);
-                            this.$nextTick(() => {
-                                this.selectedCity = '{{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') }}';
-                            });
+                        if(res.ok) {
+                            const json = await res.json();
+                            this.provinces = json.data || [];
+                            
+                            if (this.selectedProv) {
+                                await this.loadCities(this.selectedProv);
+                                this.$nextTick(() => {
+                                    this.selectedCity = '{{ old('kota_kabupaten', $pendaftar->kota_kabupaten ?? '') }}';
+                                });
+                            }
                         }
-                    } catch (error) {
-                        console.error('Gagal memuat data provinsi:', error);
-                    }
+                    } catch (error) { console.error('Data provinsi tidak ditemukan:', error); }
                 },
 
                 async loadCities(provinceId) {
                     if (!provinceId) { this.cities = []; return; }
                     try {
                         const res = await fetch(`/data/kabkota/${provinceId}.json`);
-                        const json = await res.json();
-                        this.cities = json.data || [];
-                    } catch (error) {
-                        console.error('Gagal memuat data kota:', error);
-                        this.cities = [];
-                    }
+                        if(res.ok) {
+                            const json = await res.json();
+                            this.cities = json.data || [];
+                        }
+                    } catch (error) { this.cities = []; }
                 },
 
                 handleFileUpload(event, type) {
@@ -492,7 +461,6 @@ files: {
                         alert('Ukuran file maksimal 2MB!');
                         event.target.value = ''; return;
                     }
-
                     if (type === 'foto' && !['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
                         alert('Pas Foto harus berformat JPG/PNG!');
                         event.target.value = ''; return;
@@ -505,43 +473,12 @@ files: {
                         alert('Ijazah harus berformat PDF!');
                         event.target.value = ''; return;
                     }
-
                     this.files[type] = file.name;
-                    this.newUploads[type] = true; // Tandai bahwa ini file baru
                 }
             }));
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            feather.replace();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const formElements = form.querySelectorAll('input:not([type="file"]), select, textarea');
-            const savedData = JSON.parse(localStorage.getItem('draftFormulir') || '{}');
-            
-            formElements.forEach(el => {
-                if (el.name && savedData[el.name] && !el.value) {
-                    if(el.type === 'radio') {
-                        if(el.value === savedData[el.name]) el.checked = true;
-                    } else {
-                        el.value = savedData[el.name];
-                    }
-                }
-            });
-
-            form.addEventListener('input', function(e) {
-                if (e.target.name && e.target.type !== 'file' && e.target.name !== '_token') {
-                    savedData[e.target.name] = e.target.value;
-                    localStorage.setItem('draftFormulir', JSON.stringify(savedData));
-                }
-            });
-
-            form.addEventListener('submit', function() {
-                localStorage.removeItem('draftFormulir');
-            });
-        });
+        document.addEventListener('DOMContentLoaded', () => { feather.replace(); });
     </script>
 </body>
 </html>

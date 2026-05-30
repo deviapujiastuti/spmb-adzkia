@@ -4,60 +4,89 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\DataPendaftar;
 
 class AuthController extends Controller
 {
-    // Fungsi untuk memproses login
     public function authenticate(Request $request)
     {
-        // 1. Validasi input
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        // Tangkap input (bisa dari login_admin 'email' atau login pendaftar 'login_input')
+        $loginInput = $request->input('login_input') ?? $request->input('email');
+        $password = $request->input('password');
 
-        // 2. Coba login
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
+        if (!$loginInput || !$password) {
+            return back()->with('error', 'Kredensial tidak boleh kosong.');
+        }
 
-            // 3. Cek Role dan Divisi untuk menentukan halaman tujuan (Redirect)
-            
-            if ($user->role === 'super_admin') {
-                return redirect()->intended('/admin');
-            } 
-            elseif ($user->role === 'admin') {
-                // Lempar ke halaman sesuai divisi tugasnya
-                if ($user->divisi === 'Keuangan') {
-                    return redirect()->intended('/admin/validasi-pembayaran');
-                } elseif ($user->divisi === 'Verifikator Berkas') {
-                    return redirect()->intended('/admin/validasi-daftar-ulang');
-                } elseif ($user->divisi === 'Humas & Informasi') {
-                    return redirect()->intended('/admin/pengumuman');
+        // ========================================================
+        // SKENARIO 1: CEK LOGIN SEBAGAI ADMIN (Tabel `users`)
+        // ========================================================
+        if (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
+            if (Auth::attempt(['email' => $loginInput, 'password' => $password])) {
+                $request->session()->regenerate();
+                $user = Auth::user();
+
+                if ($user->role === 'super_admin') {
+                    return redirect()->intended('/admin');
                 } else {
-                    return redirect()->intended('/admin'); // Default staf
+                    if ($user->divisi === 'Keuangan') return redirect()->intended('/admin/validasi-pembayaran');
+                    if ($user->divisi === 'Verifikator Berkas') return redirect()->intended('/admin/validasi-daftar-ulang');
+                    if ($user->divisi === 'Humas & Informasi') return redirect()->intended('/admin/pengumuman');
+                    return redirect()->intended('/admin');
                 }
-            } 
-            else {
-                // Jika user biasa (pendaftar mahasiswa)
-                return redirect()->intended('/dashboard-user'); 
             }
         }
 
-        // Jika email/password salah, kembalikan dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        // ========================================================
+        // SKENARIO 2: CEK LOGIN SEBAGAI PENDAFTAR (Tabel `data_pendaftars`)
+        // ========================================================
+        $pendaftar = DataPendaftar::where('no_pendaftaran', $loginInput)
+                        ->orWhere('email', $loginInput)
+                        ->first();
+
+        if ($pendaftar && Hash::check($password, $pendaftar->password)) {
+            
+            // Hapus sesi admin jika sebelumnya ada yang login di browser yang sama
+            if (Auth::check()) {
+                Auth::logout();
+            }
+
+            // Buat Sesi Manual untuk Pendaftar
+            $request->session()->regenerate();
+            session([
+                'is_pendaftar' => true,
+                'pendaftar_id' => $pendaftar->id,
+                'nama_pendaftar' => $pendaftar->nama_lengkap
+            ]);
+
+            return redirect()->intended('/dashboard-user');
+        }
+
+        // ========================================================
+        // JIKA KEDUANYA GAGAL
+        // ========================================================
+        return back()->with('error', 'Login gagal. ID/Email atau password salah.');
     }
 
-    // Fungsi untuk memproses logout
-    public function logout(Request $request)
+public function logout(Request $request)
     {
-        Auth::logout();
-        
+        // SKENARIO 1: Jika yang klik logout adalah ADMIN
+        if (Auth::check()) {
+            Auth::logout(); // Matikan akses admin
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            // Langsung paksa arahkan ke login admin
+            return redirect('/login-admin'); 
+        }
+
+        // SKENARIO 2: Jika yang klik logout adalah PENDAFTAR
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login'); // Arahkan kembali ke halaman login setelah keluar
+        return redirect('/login');
     }
 }

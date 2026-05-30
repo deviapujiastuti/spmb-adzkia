@@ -10,32 +10,74 @@ use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
+    // Menampilkan halaman pendaftaran (Tahap 1 SPMB)
     public function showRegister()
     {
-        $prodiList = \App\Models\Prodi::all(); 
-        return view('user.register', compact('prodiList'));
+        $prodiList = Prodi::all(); 
+        
+        // Data Dummy untuk Pilihan Jalur Khusus (Jika belum ada dari database)
+        $jalurKhusus = [
+            'Prestasi' => [
+                (object)['name' => 'Prestasi Akademik (Juara Kelas/Olimpiade)'],
+                (object)['name' => 'Prestasi Non-Akademik (Olahraga/Seni)'],
+                (object)['name' => 'Tahfidz Al-Quran']
+            ],
+            'Kemitraan' => [
+                (object)['name' => 'Kemitraan Instansi Pemerintah'],
+                (object)['name' => 'Rekomendasi Yayasan Adzkia']
+            ]
+        ];
+
+        return view('user.register', compact('prodiList', 'jalurKhusus'));
     }
 
+    // Memproses data yang dikirim dari form
     public function storeRegister(Request $request)
     {
+        // 1. Validasi Input dari Form
         $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'nik'          => 'required|numeric|digits:16|unique:data_pendaftars,nik',
-            'no_whatsapp'  => 'required|numeric',
-            'email'        => 'required|email|unique:data_pendaftars,email',
-            'pilihan_jurusan_1' => 'required',
-            'pilihan_jurusan_2' => 'required|different:pilihan_jurusan_1',
+            'jalur_pendaftaran' => 'required|string',
+            'nama_lengkap'      => 'required|string|max:255',
+            'nik'               => 'required|numeric|digits:16|unique:data_pendaftars,nik',
+            'no_whatsapp'       => 'required|numeric',
+            'email'             => 'required|email|unique:data_pendaftars,email',
+            'pilihan_jurusan_1' => 'required|string',
+            'pilihan_jurusan_2' => 'required|string|different:pilihan_jurusan_1',
             'alamat_rumah'      => 'required|string',
+        ], [
+            'nik.unique' => 'NIK ini sudah terdaftar. Silakan hubungi admin jika merasa ini kesalahan.',
+            'nik.digits' => 'NIK harus terdiri dari 16 angka.',
+            'email.unique' => 'Email ini sudah digunakan. Silakan gunakan email lain.',
+            'pilihan_jurusan_2.different' => 'Pilihan Jurusan 2 tidak boleh sama dengan Pilihan Jurusan 1.'
         ]);
 
-        $tahun = date('Y');
-        $jumlahReguler = DataPendaftar::where('jalur_pendaftaran', 'Reguler')->count() + 1;
-        $noPendaftaran = 'REG-' . $tahun . '-' . str_pad($jumlahReguler, 4, '0', STR_PAD_LEFT);
-        $rawPassword = Str::random(6);
+        // 2. Tentukan Biaya berdasarkan Jalur
+        // Asumsi: Reguler = 250.000, Khusus (Prestasi/Yayasan) = Gratis (0)
+        $nominalBiaya = ($request->jalur_pendaftaran === 'Reguler') ? 250000 : 0;
+        
+        // Jika biayanya 0, status langsung "Lunas/Terverifikasi", jika bayar statusnya "Belum Bayar"
+        $statusPembayaran = ($nominalBiaya == 0) ? 'Terverifikasi' : 'Belum Bayar';
 
+        // 3. Generate Nomor Pendaftaran Otomatis (Contoh: REG-2026-0001)
+        $tahun = date('Y');
+        // Cari pendaftar terakhir di tahun ini untuk menghitung urutan
+        $pendaftarTerakhir = DataPendaftar::whereYear('created_at', $tahun)->orderBy('id', 'desc')->first();
+        
+        if ($pendaftarTerakhir) {
+            $urutan = (int) substr($pendaftarTerakhir->no_pendaftaran, -4) + 1;
+        } else {
+            $urutan = 1;
+        }
+        
+        $noPendaftaran = 'REG-' . $tahun . '-' . str_pad($urutan, 4, '0', STR_PAD_LEFT);
+
+        // 4. Generate Password Acak 6 Karakter (Huruf & Angka)
+        $rawPassword = Str::upper(Str::random(6)); // Dibuat huruf besar agar mudah dibaca
+
+        // 5. Simpan ke Database
         $pendaftar = DataPendaftar::create([
             'no_pendaftaran'    => $noPendaftaran,
-            'jalur_pendaftaran' => 'Reguler',
+            'jalur_pendaftaran' => $request->jalur_pendaftaran . ($request->spesifikasi_jalur ? ' - ' . $request->spesifikasi_jalur : ''),
             'nama_lengkap'      => $request->nama_lengkap,
             'nik'               => $request->nik,
             'no_whatsapp'       => $request->no_whatsapp,
@@ -43,51 +85,27 @@ class RegisterController extends Controller
             'pilihan_jurusan_1' => $request->pilihan_jurusan_1,
             'pilihan_jurusan_2' => $request->pilihan_jurusan_2,
             'alamat_rumah'      => $request->alamat_rumah,
-            'password'          => Hash::make($rawPassword),
-            'nominal_biaya'     => 250000,
-            'status_pembayaran' => 'Belum Bayar',
+            'password'          => Hash::make($rawPassword), // Hash password sebelum simpan
+            'nominal_biaya'     => $nominalBiaya,
+            'status_pembayaran' => $statusPembayaran,
+            'status_pendaftaran' => 'Draft' // Status awal
         ]);
 
+        // 6. (Opsional) Kirim notifikasi WA
         $this->kirimNotifikasiWA($pendaftar->no_whatsapp, $pendaftar->nama_lengkap, $noPendaftaran, $rawPassword);
         
+        // 7. Arahkan ke halaman login sambil membawa Kunci Akses (Username & Password)
         return redirect()->route('login')->with([
-            'success' => 'Pendaftaran Berhasil!',
+            'success' => 'Pendaftaran Tahap 1 Berhasil!',
             'no_pendaftaran' => $noPendaftaran,
             'password'       => $rawPassword
         ]);
     }
 
- public function loginProses(Request $request)
-    {
-        $request->validate([
-            'login_input' => 'required',
-            'password'    => 'required',
-        ]);
-
-        $pendaftar = DataPendaftar::where('email', $request->login_input)
-            ->orWhere('no_pendaftaran', $request->login_input)
-            ->first();
-
-        if ($pendaftar && Hash::check($request->password, $pendaftar->password)) {
-             session()->put('pendaftar_id', $pendaftar->id); 
-             session()->put('nama_pendaftar', $pendaftar->nama_lengkap);
-             
-             // KUNCI PERBAIKAN: Selalu arahkan ke hub dashboard utama terlebih dahulu
-             return redirect()->route('dashboard.user');
-        }
-
-        return back()->withErrors(['login_error' => 'Email/No. Pendaftaran atau Password salah.'])->onlyInput('login_input');
-    }
-
-    public function logout()
-    {
-        session()->forget(['pendaftar_id', 'nama_pendaftar']);
-        return redirect()->route('login');
-    }
-
     private function kirimNotifikasiWA($nomor, $nama, $username, $password)
     {
-        $isiPesan = "Halo {$nama}, akun anda: {$username} Pass: {$password}";
+        // Fitur ini bisa dikembangkan nanti menggunakan API (misal Fonnte / Wablas)
+        $isiPesan = "Halo {$nama}, Pendaftaran SPMB Universitas Adzkia Berhasil. No Pendaftaran: {$username}, Password: {$password}";
         logger($isiPesan);
     }
 }

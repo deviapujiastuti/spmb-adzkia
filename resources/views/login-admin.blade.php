@@ -35,37 +35,39 @@
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
             
             <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-6 shadow-xl">
-                <div class="w-8 h-10 bg-orange-500 rounded-b-lg rounded-t-sm flex items-end justify-center pb-1">
-                    <div class="w-3 h-3 bg-white rounded-full"></div>
-                </div>
+                <img src="{{ asset('images/logo-adzkia.png') }}" alt="Logo Universitas Adzkia" class="h-11 w-auto transition-transform group-hover:scale-105 duration-300">
             </div>
             
-            <h1 class="text-white text-2xl font-extrabold tracking-tight mb-2">Portal Staff</h1>
+            <h1 class="text-white text-2xl font-extrabold tracking-tight mb-2">Portal Admin</h1>
             <p class="text-white/60 text-sm font-medium">Silakan masuk untuk mengelola sistem pendaftaran</p>
         </div>
 
-        <div class="p-10" x-data="{ 
-            showPassword: false, 
-            isLoading: false,
-            prosesLogin() {
-                this.isLoading = true;
-                setTimeout(() => {
-                    window.location.href = '/admin';
-                }, 1500);
-            }
-        }">
-            <form @submit.prevent="prosesLogin()" class="space-y-6">
+        <div class="p-10" x-data="{ showPassword: false, isLoading: false }">
+            
+            {{-- ALERT JIKA EMAIL/PASSWORD SALAH ATAU BELUM LOGIN --}}
+            @if($errors->any() || session('error'))
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+                    <i data-feather="x-circle" class="w-5 h-5 text-red-500 shrink-0"></i>
+                    <p class="text-[12px] font-bold text-red-700">
+                        {{ $errors->first() ?: session('error') }}
+                    </p>
+                </div>
+            @endif
+
+            {{-- FORM ASLI MENGARAH KE SISTEM BACK-END --}}
+            <form action="{{ route('login.post') }}" method="POST" @submit="isLoading = true" class="space-y-6">
+                @csrf
                 
                 <div>
                     <label class="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-2.5">
-                        Employee ID / Username
+                        Alamat Email Admin
                     </label>
                     <div class="relative group">
                         <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-adzkia-badge-txt transition-colors">
                             <i data-feather="user" class="w-4 h-4"></i>
                         </div>
-                        <input type="text" required
-                               placeholder="Contoh: ADZ-12345" 
+                        <input type="email" name="email" required value="{{ old('email') }}"
+                               placeholder="admin@adzkia.ac.id" 
                                class="w-full pl-12 pr-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-adzkia-badge-bg focus:ring-0 outline-none transition-all font-bold text-[14px] placeholder-gray-300">
                     </div>
                 </div>
@@ -79,7 +81,7 @@
                             <i data-feather="lock" class="w-4 h-4"></i>
                         </div>
                         
-                        <input :type="showPassword ? 'text' : 'password'" required
+                        <input :type="showPassword ? 'text' : 'password'" name="password" required
                                placeholder="••••••••" 
                                class="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-adzkia-badge-bg focus:ring-0 outline-none transition-all font-bold text-[14px] placeholder-gray-300">
                         
@@ -94,7 +96,7 @@
 
                 <div class="flex items-center justify-between text-[12px] font-bold text-gray-400">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-adzkia-dark focus:ring-adzkia-dark">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-adzkia-dark focus:ring-adzkia-dark">
                         <span>Ingat Sesi Ini</span>
                     </label>
                     <a href="#" class="text-adzkia-badge-txt hover:underline">Bantuan Login</a>
@@ -108,7 +110,7 @@
                         Otoritasi Masuk <i data-feather="shield" class="w-4 h-4"></i>
                     </span>
 
-                    <span x-show="isLoading" class="flex items-center gap-3" style="display: none;">
+                    <span x-show="isLoading" class="flex items-center gap-3" x-cloak>
                         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

@@ -18,17 +18,16 @@
         <a href="/#kontak" @click="activeTab = 'kontak'" :class="activeTab === 'kontak' ? 'text-adzkia-blue border-b-[3px] border-adzkia-blue pb-1.5' : 'hover:text-adzkia-blue transition-colors pb-1.5'">Kontak</a>
     </div>
 
+{{-- TOMBOL AUTH DESKTOP --}}
     <div class="hidden lg:flex items-center gap-3">
-        @guest
+        @if(session('is_pendaftar'))
+            {{-- Jika Login sebagai Pendaftar, arahkan ke dasbornya --}}
+            <a href="/dashboard-user" class="px-6 py-2.5 bg-adzkia-blue text-white font-bold rounded-full hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-95 transition-all text-[14px]">Dasbor Saya</a>
+        @else
+            {{-- Tampilan Default (Bisa dilihat Guest atau Admin yang sedang iseng buka halaman depan) --}}
             <a href="/login" class="px-6 py-2.5 border-2 border-adzkia-blue text-adzkia-blue font-bold rounded-full hover:bg-adzkia-badge-bg transition-all text-[14px]">Masuk</a>
             <a href="/register" class="px-6 py-2.5 bg-adzkia-red text-white font-bold rounded-full hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/20 active:scale-95 transition-all text-[14px]">Daftar</a>
-        @endguest
-        @auth
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="px-6 py-2.5 text-adzkia-red font-bold hover:underline text-[14px]">Logout</button>
-            </form>
-        @endauth
+        @endif
     </div>
 
     <div class="lg:hidden flex items-center z-50">
@@ -63,17 +62,16 @@
             <a href="/#kontak" @click="mobileMenuOpen = false" class="py-3 border-b border-gray-50 hover:text-adzkia-blue">Kontak</a>
         </div>
         
+{{-- TOMBOL AUTH MOBILE --}}
         <div class="flex flex-col gap-3 pt-2">
-            @guest
+            @if(session('is_pendaftar'))
+                {{-- Jika Login sebagai Pendaftar --}}
+                <a href="/dashboard-user" class="text-center w-full py-3 bg-adzkia-blue text-white font-bold rounded-full hover:bg-blue-700 transition-all shadow-md">Dasbor Saya</a>
+            @else
+                {{-- Tampilan Default --}}
                 <a href="/login" class="text-center w-full py-3 border-2 border-adzkia-blue text-adzkia-blue font-bold rounded-full hover:bg-adzkia-badge-bg transition-all">Masuk</a>
                 <a href="/register" class="text-center w-full py-3 bg-adzkia-red text-white font-bold rounded-full hover:bg-red-700 transition-all shadow-md">Daftar Sekarang</a>
-            @endguest
-            @auth
-                <form action="{{ route('logout') }}" method="POST" class="w-full">
-                    @csrf
-                    <button type="submit" class="text-center w-full py-3 bg-adzkia-red text-white font-bold rounded-full">Logout</button>
-                </form>
-            @endauth
+            @endif
         </div>
     </div>
 </nav>
