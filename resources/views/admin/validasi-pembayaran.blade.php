@@ -18,6 +18,20 @@
         </div>
     </div>
 
+    {{-- ALERT PESAN --}}
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-xl flex items-start gap-3">
+            <i data-feather="check-circle" class="w-5 h-5 text-green-600 shrink-0"></i>
+            <p class="text-[13px] font-bold text-green-800">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl flex items-start gap-3">
+            <i data-feather="alert-circle" class="w-5 h-5 text-red-600 shrink-0"></i>
+            <p class="text-[13px] font-bold text-red-800">{{ session('error') }}</p>
+        </div>
+    @endif
+
     <form action="{{ route('admin.pembayaran') }}" method="GET" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-3">
             <span class="text-[12px] font-extrabold text-gray-400 uppercase tracking-widest">Jalur:</span>
@@ -54,7 +68,7 @@
                 <thead class="bg-gray-50/50 text-[11px] font-black text-brand-dark uppercase tracking-widest border-b border-gray-100">
                     <tr>
                         <th class="px-6 py-5">Nama Pendaftar</th>
-                        <th class="px-4 py-5">Program Studi</th>
+                        <th class="px-4 py-5">Pilihan Program Studi</th>
                         <th class="px-4 py-5">Nominal</th>
                         <th class="px-4 py-5">Bank Asal</th>
                         <th class="px-4 py-5">Status</th>
@@ -72,11 +86,16 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="font-bold text-brand-dark text-[14px]">{{ $data->nama_lengkap }}</span>
-                                    <span class="text-gray-400 text-[11px] font-extrabold tracking-wider">REG-2026-00{{ $data->id }}</span>
+                                    <span class="text-gray-400 text-[11px] font-extrabold tracking-wider">{{ $data->no_pendaftaran }}</span>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-4 font-bold text-gray-600">{{ $data->pilihan_jurusan_1 }}</td>
+                        <td class="px-4 py-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-gray-700"><span class="text-gray-400">1.</span> {{ $data->pilihan_jurusan_1 ?? '-' }}</span>
+                                <span class="text-[11px] font-bold text-gray-700"><span class="text-gray-400">2.</span> {{ $data->pilihan_jurusan_2 ?? '-' }}</span>
+                            </div>
+                        </td>
                         <td class="px-4 py-4 font-black text-brand-dark">Rp {{ number_format($data->nominal_biaya ?? 0, 0, ',', '.') }}</td>
                         <td class="px-4 py-4">
                             <div class="flex flex-col">
@@ -93,21 +112,23 @@
                             <button @click="bukaModal(
                                         '{{ $data->nama_lengkap }}', 
                                         '{{ $data->id }}', 
+                                        '{{ $data->no_pendaftaran }}', 
                                         '{{ $data->pilihan_jurusan_1 }}', 
+                                        '{{ $data->pilihan_jurusan_2 }}', 
                                         '{{ $data->metode_pembayaran }}', 
                                         'Rp {{ number_format($data->nominal_biaya ?? 0, 0, ',', '.') }}', 
                                         '{{ $data->created_at->format('d M Y H:i') }}',
                                         '{{ $data->jalur_pendaftaran }}',
-                                        '{{ $data->bukti_bayar ? asset('storage/' . $data->bukti_bayar) : '' }}'
+                                        '{{ $data->bukti_pembayaran ? asset('uploads/bukti_bayar/' . $data->bukti_pembayaran) : '' }}'
                                     )" 
-                                        class="px-4 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
+                                    class="px-4 py-2 bg-brand-dark text-white rounded-lg font-bold text-[11px] hover:bg-brand-blue transition-colors shadow-sm">
                                 Validasi
                             </button>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500 font-bold">Tidak ada antrian pembayaran.</td>
+                        <td colspan="6" class="px-6 py-10 text-center text-gray-500 font-bold">Tidak ada antrian pembayaran saat ini.</td>
                     </tr>
                     @endforelse
 
@@ -116,20 +137,21 @@
         </div>
         
         <div class="p-6 border-t border-gray-100 flex justify-end gap-2">
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50 hover:bg-gray-100 transition-colors"><i data-feather="chevron-left" class="w-4 h-4"></i></button>
-            <button class="w-8 h-8 rounded-lg bg-brand-dark text-white font-bold text-[13px] flex items-center justify-center">1</button>
-            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50 hover:bg-gray-100 transition-colors"><i data-feather="chevron-right" class="w-4 h-4"></i></button>
+            @if(method_exists($pendaftarPending, 'links'))
+                {{ $pendaftarPending->links() }}
+            @endif
         </div>
     </div>
 
-    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+    {{-- MODAL ALPINEJS --}}
+    <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center px-4" style="display: none;" x-cloak>
         <div x-show="modalOpen" x-transition.opacity @click="modalOpen = false" class="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm cursor-pointer"></div>
         
-        <div x-show="modalOpen" class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+        <div x-show="modalOpen" class="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div>
                     <h2 class="text-xl font-extrabold text-brand-dark tracking-tight">Detail Validasi Pembayaran</h2>
-                    <p class="text-[12px] font-bold text-gray-400 mt-1 uppercase tracking-widest">REG-2026-00<span x-text="dataPendaftar.id"></span></p>
+                    <p class="text-[12px] font-bold text-gray-400 mt-1 uppercase tracking-widest"><span x-text="dataPendaftar.noReg"></span></p>
                 </div>
                 <button @click="modalOpen = false" class="p-2 bg-white border border-gray-200 hover:bg-gray-100 rounded-full transition-colors">
                     <i data-feather="x" class="w-4 h-4 text-gray-500"></i>
@@ -143,10 +165,16 @@
                             <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Nama Lengkap</p>
                             <p class="text-[15px] font-bold text-brand-dark" x-text="dataPendaftar.nama"></p>
                         </div>
+                        
+                        {{-- KEDUA PROGRAM STUDI DITAMPILKAN DI SINI --}}
                         <div>
-                            <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Program Studi Pilihan</p>
-                            <span class="px-3 py-1 bg-brand-blue-light text-brand-blue rounded-lg text-[12px] font-bold inline-block" x-text="dataPendaftar.prodi"></span>
+                            <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">Program Studi Pilihan</p>
+                            <div class="flex flex-col gap-1.5">
+                                <span class="px-3 py-1.5 bg-brand-blue-light text-brand-blue rounded-lg text-[11px] font-bold w-fit" x-text="'1. ' + dataPendaftar.prodi1"></span>
+                                <span class="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[11px] font-bold w-fit" x-text="'2. ' + dataPendaftar.prodi2"></span>
+                            </div>
                         </div>
+
                         <div>
                             <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Jalur Pendaftaran</p>
                             <p class="text-[14px] font-bold text-gray-700" x-text="dataPendaftar.jalurLengkap"></p>
@@ -157,7 +185,7 @@
                                 <span class="text-[14px] font-black text-brand-dark" x-text="dataPendaftar.nominal"></span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-[12px] font-bold text-gray-500">Metode Pembayaran</span>
+                                <span class="text-[12px] font-bold text-gray-500">Metode</span>
                                 <span class="text-[13px] font-bold text-brand-dark" x-text="dataPendaftar.bank"></span>
                             </div>
                             <div class="flex justify-between items-center">
@@ -168,26 +196,52 @@
                     </div>
                     <div>
                         <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">Bukti Transfer</p>
-                        <div class="w-full h-64 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center p-2">
-                            <img :src="dataPendaftar.buktiUrl" class="w-full h-full object-contain rounded-xl" alt="Bukti Pembayaran">
+                        <div class="w-full h-72 bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center p-2 relative group overflow-hidden">
+                            
+                            {{-- FOTO BUKTI PEMBAYARAN --}}
+                            <template x-if="dataPendaftar.buktiUrl">
+                                <img :src="dataPendaftar.buktiUrl" class="w-full h-full object-contain rounded-xl" alt="Bukti Pembayaran">
+                            </template>
+                            
+                            <template x-if="!dataPendaftar.buktiUrl">
+                                <div class="text-center">
+                                    <i data-feather="image" class="w-8 h-8 text-gray-300 mx-auto mb-2"></i>
+                                    <p class="text-[11px] font-bold text-gray-400">Belum ada bukti yang diunggah</p>
+                                </div>
+                            </template>
+                            
+                            {{-- Fitur Lihat Layar Penuh --}}
+                            <a :href="dataPendaftar.buktiUrl" target="_blank" x-show="dataPendaftar.buktiUrl" class="absolute inset-0 bg-brand-dark/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+                                <span class="bg-white text-brand-dark px-4 py-2 rounded-lg font-bold text-[11px] flex items-center gap-2">
+                                    <i data-feather="maximize-2" class="w-3.5 h-3.5"></i> Lihat Penuh
+                                </span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <button @click="modalOpen = false" class="px-6 py-3 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-bold text-[13px] transition-colors">Tolak</button>
-                <div class="flex gap-3">
-                    <button @click="modalOpen = false" class="px-6 py-3 border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 rounded-xl font-bold text-[13px]">Batal</button>
-<form action="{{ route('admin.proses.validasi') }}" method="POST">
-    @csrf
-    <!-- Gunakan x-bind untuk mengisi ID pendaftar dari dataPendaftar yang sedang aktif di modal -->
-    <input type="hidden" name="pendaftar_id" x-bind:value="dataPendaftar.id">
-    
-    <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-[13px] hover:bg-green-700 transition-colors">
-        Setujui & Verifikasi
-    </button>
-</form>
+            <div class="p-6 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50/50">
+                <button @click="modalOpen = false" type="button" class="w-full md:w-auto px-6 py-3.5 border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 rounded-xl font-bold text-[13px] transition-colors order-3 md:order-1">
+                    Batal
+                </button>
+                
+                <div class="flex gap-3 w-full md:w-auto order-1 md:order-2">
+                    {{-- Form Penolakan (Revisi) --}}
+                    <form :action="'/admin/tolak-pembayaran/' + dataPendaftar.id" method="POST" class="w-full md:w-auto">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Apakah Anda yakin menolak bukti ini dan meminta pendaftar mengunggah ulang?')" class="w-full bg-red-50 text-red-600 border border-red-200 px-6 py-3.5 rounded-xl font-bold text-[13px] hover:bg-red-600 hover:text-white transition-colors">
+                            Tolak & Revisi
+                        </button>
+                    </form>
+                    
+                    {{-- Form Setujui --}}
+                    <form :action="'/admin/setujui-pembayaran/' + dataPendaftar.id" method="POST" class="w-full md:w-auto">
+                        @csrf
+                        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3.5 rounded-xl font-bold text-[13px] hover:bg-green-700 transition-colors shadow-sm">
+                            Setujui & Aktifkan
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -196,17 +250,17 @@
 
 <script>
     function validasiPembayaran() {
-    return {
-        modalOpen: false,
-        // Pastikan 'buktiUrl' ada di sini!
-        dataPendaftar: { nama: '', id: '', prodi: '', bank: '', nominal: '', tanggal: '', jalurLengkap: '', buktiUrl: '' },
-        
-        bukaModal(nama, id, prodi, bank, nominal, tanggal, jalurLengkap, buktiUrl) {
-    console.log("Path Gambar yang diterima:", buktiUrl); // Lihat ini di Console browser (F12)
-    this.dataPendaftar = { nama, id, prodi, bank, nominal, tanggal, jalurLengkap, buktiUrl };
-    this.modalOpen = true;
+        return {
+            modalOpen: false,
+            // Menambahkan prodi1 dan prodi2
+            dataPendaftar: { nama: '', id: '', noReg: '', prodi1: '', prodi2: '', bank: '', nominal: '', tanggal: '', jalurLengkap: '', buktiUrl: '' },
+            
+            // Parameter fungsi juga ditambah
+            bukaModal(nama, id, noReg, prodi1, prodi2, bank, nominal, tanggal, jalurLengkap, buktiUrl) {
+                this.dataPendaftar = { nama, id, noReg, prodi1, prodi2, bank, nominal, tanggal, jalurLengkap, buktiUrl };
+                this.modalOpen = true;
+            }
         }
     }
-}
 </script>
 @endsection

@@ -54,7 +54,7 @@
 <main class="px-16 py-12 flex items-center justify-between bg-adzkia-bg">
     <div class="w-1/2 pr-12">
         <div class="inline-block px-4 py-1.5 bg-adzkia-badge-bg text-adzkia-badge-txt text-[13px] font-bold rounded-full tracking-wide mb-6">
-            TAHUN AKADEMIK 2024/2025
+            TAHUN AKADEMIK 2026/2027
         </div>
         <h1 class="text-[4.5rem] font-extrabold leading-[1.05] tracking-tight mb-6">
             <span class="text-adzkia-blue block">Penerimaan</span>
@@ -128,7 +128,7 @@
     </div>
 </section>
 
-<section id="prodi" x-data class="px-16 py-20 bg-adzkia-bg">
+<section id="prodi" class="px-16 py-20 bg-adzkia-bg">
     <div class="flex justify-between items-end mb-12">
         <div>
             <h2 class="text-[2.2rem] font-extrabold text-adzkia-blue mb-2">Program Studi</h2>
@@ -138,50 +138,33 @@
     </div>
 
     <div class="grid md:grid-cols-3 gap-6 mb-12">
-        <template x-for="prodi in $store.kampus.programs.slice(0, 3)" :key="prodi.id">
-            <div @click="$store.kampus.openModal(prodi)" class="p-8 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[260px]">
+        @forelse($prodis as $prodi)
+            <a href="/program-studi" class="p-8 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[260px]">
                 <div>
                     <div class="flex justify-between items-start mb-6">
-                        <div class="w-12 h-12 bg-adzkia-badge-bg rounded-[14px] flex items-center justify-center group-hover:bg-adzkia-blue transition-colors duration-300"
-                             x-html="feather.icons[prodi.icon].toSvg({ class: 'w-5 h-5 text-adzkia-blue group-hover:text-white transition-colors' })">
+                        <div class="w-12 h-12 bg-adzkia-badge-bg rounded-[14px] flex items-center justify-center group-hover:bg-adzkia-blue transition-colors duration-300">
+                            <i data-feather="book-open" class="w-5 h-5 text-adzkia-blue group-hover:text-white transition-colors"></i>
                         </div>
                         
                         <div class="px-3 py-1.5 bg-adzkia-blue text-white rounded-lg text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-1.5">
-                            <span x-html="feather.icons['award'].toSvg({ class: 'w-3 h-3' })"></span>
-                            <span x-text="prodi.acc"></span>
+                            <i data-feather="award" class="w-3 h-3"></i>
+                            <span>{{ $prodi->akreditasi ?? 'B' }}</span>
                         </div>
                     </div>
                     
-                    <div class="text-[12px] font-extrabold text-gray-400 mb-1" x-text="prodi.level"></div>
-                    <h3 class="text-xl font-extrabold text-adzkia-blue mb-3 group-hover:text-adzkia-red transition-colors" x-text="prodi.name"></h3>
-                    <p class="text-gray-500 text-[13px] leading-relaxed mb-6 font-medium line-clamp-2" x-text="prodi.desc"></p>
+                    <div class="text-[12px] font-extrabold text-gray-400 mb-1">{{ $prodi->jenjang ?? 'S1' }}</div>
+                    <h3 class="text-xl font-extrabold text-adzkia-blue mb-3 group-hover:text-adzkia-red transition-colors">{{ $prodi->nama_prodi }}</h3>
+                    <p class="text-gray-500 text-[13px] leading-relaxed mb-6 font-medium line-clamp-2">{{ $prodi->deskripsi ?? 'Program studi unggulan yang siap mencetak generasi profesional.' }}</p>
                 </div>
                 
                 <p class="text-[13px] font-extrabold text-adzkia-red flex items-center gap-2 group-hover:gap-3 transition-all">
-                    Detail Prodi <span x-html="feather.icons['arrow-right'].toSvg({ class: 'w-4 h-4' })"></span>
+                    Detail Prodi <i data-feather="arrow-right" class="w-4 h-4"></i>
                 </p>
-            </div>
-        </template>
-    </div>
-
-    <div class="bg-white rounded-[2rem] p-8 flex items-center justify-between border border-gray-100 shadow-sm relative overflow-hidden">
-        <div class="absolute right-16 bottom-[-20px] text-[150px] font-black text-gray-50 leading-none pointer-events-none select-none z-0">?</div>
-        <div class="w-[35%] relative z-10">
-            <img src="https://images.unsplash.com/photo-1591991564021-0662a8573199?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                 class="rounded-3xl h-[200px] w-full object-cover shadow-md" alt="Ilustrasi Tes Bakat">
-        </div>
-        <div class="w-[65%] pl-12 relative z-10 flex flex-col items-start justify-center">
-            <div class="px-3 py-1 bg-adzkia-badge-red-bg text-adzkia-red text-[10px] font-extrabold rounded-md mb-4 tracking-wider">IKUTI TES KAMI</div>
-            <h3 class="text-3xl font-extrabold text-adzkia-blue mb-3">Bingung Pilih Jurusan?</h3>
-            <p class="text-gray-500 text-[14px] mb-6 max-w-[85%] font-medium leading-relaxed">
-                Temukan program studi yang paling sesuai dengan kepribadian, minat, dan potensi karir masa depanmu.
-            </p>
-            <a href="/rekomendasi/mulai" class="px-8 py-3 bg-adzkia-red text-white text-[14px] font-bold rounded-full hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 active:scale-95">
-                Mulai Tes Sekarang
             </a>
-        </div>
+        @empty
+            <div class="col-span-3 text-center py-8 text-gray-500 font-bold">Data Program Studi belum ditambahkan.</div>
+        @endforelse
     </div>
-</section>
 
 <section id="fasilitas" class="px-16 py-24 bg-adzkia-blue text-white">
     <div class="text-center max-w-2xl mx-auto mb-16">
@@ -373,33 +356,45 @@
     </div>
 </section>
 
-<section id="berita" x-data class="px-16 py-20 bg-white relative z-30 border-b border-gray-50">
-    <div class="flex justify-between items-end mb-12">
-        <div>
-            <h2 class="text-4xl font-extrabold text-adzkia-blue tracking-tight">Berita Terkini</h2>
-            <p class="text-gray-500 mt-2 font-medium">Kabar terbaru seputar prestasi dan kegiatan kampus.</p>
-        </div>
-        <a href="/berita" class="px-8 py-3 border-2 border-adzkia-blue text-adzkia-blue font-bold rounded-full hover:bg-adzkia-blue hover:text-white transition-all">Lihat Semua</a>
-    </div>
-    
-    <div class="grid md:grid-cols-3 gap-8">
-        <template x-for="item in $store.kampus.berita.filter(b => !b.isHighlight).slice(0, 3)" :key="item.id">
-            <div class="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col">
-                <div class="relative w-full h-48 overflow-hidden">
-                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-adzkia-blue text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest z-10" x-text="item.category"></div>
-                    <img :src="item.image" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <p class="text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-3" x-text="item.date"></p>
-                    <h3 class="text-lg font-extrabold text-adzkia-blue group-hover:text-adzkia-red transition-colors mb-4 line-clamp-2" x-text="item.title"></h3>
-                    <div class="mt-auto pt-4">
-                        <p class="text-[12px] font-extrabold text-adzkia-red flex items-center gap-2 group-hover:gap-3 transition-all">
-                            Baca <span x-html="feather.icons['arrow-right'].toSvg({ class: 'w-3 h-3' })"></span>
-                        </p>
-                    </div>
-                </div>
+<section id="berita" class="w-full bg-white relative z-30 border-t border-b border-gray-100 py-20">
+    <div class="max-w-[90rem] mx-auto px-6 lg:px-16">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+            <div>
+                <h2 class="text-3xl lg:text-4xl font-extrabold text-adzkia-blue tracking-tight">Berita Terkini</h2>
+                <p class="text-gray-500 mt-2 font-medium">Kabar terbaru seputar prestasi dan kegiatan kampus.</p>
             </div>
-        </template>
+            <a href="/berita" class="px-8 py-3 border-2 border-adzkia-blue text-adzkia-blue font-bold rounded-full hover:bg-adzkia-blue hover:text-white transition-all">Lihat Semua</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @forelse($beritas as $item)
+                <a href="/berita" class="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col">
+                    <div class="relative w-full h-48 overflow-hidden bg-gray-100">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-adzkia-blue text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest z-10">
+                            {{ $item->kategori ?? 'Informasi' }}
+                        </div>
+                        <img src="{{ $item->gambar ? asset('storage/' . $item->gambar) : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=500' }}" 
+                             alt="{{ $item->judul }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <p class="text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-3">
+                            {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}
+                        </p>
+                        <h3 class="text-lg font-extrabold text-adzkia-blue group-hover:text-adzkia-red transition-colors mb-4 line-clamp-2">
+                            {{ $item->judul }}
+                        </h3>
+                        <div class="mt-auto pt-4">
+                            <p class="text-[12px] font-extrabold text-adzkia-red flex items-center gap-2 group-hover:gap-3 transition-all">
+                                Baca <i data-feather="arrow-right" class="w-3 h-3"></i>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            @empty
+                <div class="col-span-1 md:col-span-3 text-center py-8 text-gray-500 font-bold">Belum ada berita terbaru.</div>
+            @endforelse
+        </div>
     </div>
 </section>
 
@@ -407,24 +402,19 @@
     <div class="max-w-[800px] mx-auto">
         <h2 class="text-3xl font-extrabold text-adzkia-blue text-center mb-10">Pertanyaan Populer</h2>
         <div class="space-y-4">
-            <div x-data="{ open: false }" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:border-adzkia-blue transition-colors" @click="open = !open">
-                <div class="flex justify-between items-center text-left">
-                    <span class="font-extrabold text-adzkia-blue">Apa saja syarat pendaftaran jalur reguler?</span>
-                    <i data-feather="chevron-down" class="text-adzkia-red transition-transform" :class="open ? 'rotate-180' : ''"></i>
+            @forelse($faqs as $faq)
+                <div x-data="{ open: false }" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:border-adzkia-blue transition-colors" @click="open = !open">
+                    <div class="flex justify-between items-center text-left">
+                        <span class="font-extrabold text-adzkia-blue">{{ $faq->pertanyaan }}</span>
+                        <i data-feather="chevron-down" class="text-adzkia-red transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                    </div>
+                    <div x-show="open" x-collapse style="display:none;" class="mt-4 text-gray-500 font-medium text-sm leading-relaxed">
+                        {{ $faq->jawaban }}
+                    </div>
                 </div>
-                <div x-show="open" x-collapse class="mt-4 text-gray-500 font-medium text-sm">
-                    Syarat utama meliputi ijazah/SKL SMA sederajat, pas foto terbaru, dan KK. Seleksi dilakukan melalui tes tertulis atau nilai UTBK.
-                </div>
-            </div>
-            <div x-data="{ open: false }" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:border-adzkia-blue transition-colors" @click="open = !open">
-                <div class="flex justify-between items-center text-left">
-                    <span class="font-extrabold text-adzkia-blue">Apakah tersedia beasiswa penuh (full scholarship)?</span>
-                    <i data-feather="chevron-down" class="text-adzkia-red transition-transform" :class="open ? 'rotate-180' : ''"></i>
-                </div>
-                <div x-show="open" x-collapse style="display:none;" class="mt-4 text-gray-500 font-medium text-sm">
-                    Ya, kami menyediakan Beasiswa Adzkia Unggul (BAU) yang mencakup 100% biaya pendidikan hingga lulus bagi siswa berprestasi.
-                </div>
-            </div>
+            @empty
+                <div class="text-center text-gray-500 font-bold py-4">Belum ada data FAQ yang ditambahkan admin.</div>
+            @endforelse
         </div>
     </div>
 </section>

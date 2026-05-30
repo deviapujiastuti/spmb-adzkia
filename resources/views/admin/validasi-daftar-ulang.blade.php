@@ -43,8 +43,15 @@
     </div>
 
     @if(session('success'))
-        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-xl">
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-xl flex items-start gap-3">
+            <i data-feather="check-circle" class="w-5 h-5 text-green-600 shrink-0"></i>
             <p class="text-sm font-bold text-green-700">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-xl flex items-start gap-3">
+            <i data-feather="alert-circle" class="w-5 h-5 text-red-600 shrink-0"></i>
+            <p class="text-sm font-bold text-red-700">{{ session('error') }}</p>
         </div>
     @endif
 
@@ -54,7 +61,7 @@
                 <thead class="bg-gray-50/50 text-[11px] font-black text-brand-dark uppercase tracking-widest border-b border-gray-100">
                     <tr>
                         <th class="px-6 py-5">Nama & No. Daftar</th>
-                        <th class="px-4 py-5">Program Studi</th>
+                        <th class="px-4 py-5">Pilihan Program Studi</th>
                         <th class="px-4 py-5">Jalur</th>
                         <th class="px-4 py-5">Status</th>
                         <th class="px-4 py-5">Tanggal Submit</th>
@@ -78,7 +85,10 @@
                             </div>
                         </td>
                         <td class="px-4 py-4">
-                            <span class="px-4 py-1.5 bg-brand-blue-light text-brand-blue rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->pilihan_jurusan_1 ?? $data->program_studi }}</span>
+                            <div class="flex flex-col gap-1.5">
+                                <span class="px-3 py-1 bg-brand-blue-light text-brand-blue rounded-lg text-[10px] font-bold w-fit">1. {{ $data->pilihan_jurusan_1 ?? $data->program_studi ?? '-' }}</span>
+                                <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-bold w-fit">2. {{ $data->pilihan_jurusan_2 ?? '-' }}</span>
+                            </div>
                         </td>
                         <td class="px-4 py-4">
                             <span class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded-full text-[11px] font-extrabold tracking-wide">{{ $data->jalur_pendaftaran ?? 'Mandiri' }}</span>
@@ -94,7 +104,7 @@
                                 </span>
                             @elseif($data->status_pendaftaran == 'Selesai' || $data->status_pendaftaran == 'Terverifikasi')
                                 <span class="inline-flex items-center gap-1.5 text-green-500 text-[11px] font-black uppercase tracking-wider">
-                                    <div class="w-2 h-2 rounded-full bg-green-500"></div> TERVERIFIKASI
+                                    <div class="w-2 h-2 rounded-full bg-green-500"></div> VALID/SELESAI
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 text-gray-500 text-[11px] font-black uppercase tracking-wider">
@@ -113,7 +123,8 @@
                                 '{{ addslashes($data->nama_lengkap ?? 'Nama Tidak Ditemukan') }}', 
                                 '{{ $data->no_pendaftaran }}', 
                                 '{{ $data->id }}', 
-                                '{{ $data->pilihan_jurusan_1 ?? $data->program_studi }}', 
+                                '{{ $data->pilihan_jurusan_1 ?? $data->program_studi ?? '-' }}', 
+                                '{{ $data->pilihan_jurusan_2 ?? '-' }}', 
                                 '{{ $data->status_pendaftaran ?? 'Belum Lengkap' }}',
                                 '{{ $data->pas_foto ? asset('storage/' . $data->pas_foto) : '' }}',
                                 '{{ $data->scan_ktp ? asset('storage/' . $data->scan_ktp) : '' }}',
@@ -131,10 +142,17 @@
                 </tbody>
             </table>
         </div>
+        
+        <div class="p-6 border-t border-gray-100 flex justify-end gap-2">
+            {{-- Paginasi bawaan Laravel jika digunakan --}}
+            @if(method_exists($pendaftarDaftarUlang, 'links'))
+                {{ $pendaftarDaftarUlang->links() }}
+            @endif
+        </div>
     </div>
 
     {{-- MODAL --}}
-    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;" x-cloak>
         <div x-show="modalOpen" x-transition.opacity @click="modalOpen = false" class="absolute inset-0 bg-brand-dark/60 backdrop-blur-sm cursor-pointer"></div>
         
         <div x-show="modalOpen" 
@@ -155,6 +173,20 @@
 
             <div class="p-8 overflow-y-auto custom-scrollbar flex-grow space-y-6">
                 
+                {{-- INFO PRODI PILIHAN DI MODAL --}}
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-brand-blue flex items-center justify-center shrink-0">
+                        <i data-feather="book-open" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-black text-brand-blue uppercase tracking-widest mb-1">Program Studi Pilihan</p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <span class="text-[13px] font-bold text-brand-dark bg-white px-3 py-1 rounded shadow-sm">1. <span x-text="dataSiswa.prodi1"></span></span>
+                            <span class="text-[13px] font-bold text-brand-dark bg-white px-3 py-1 rounded shadow-sm">2. <span x-text="dataSiswa.prodi2"></span></span>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- DOKUMEN 1: IJAZAH --}}
                 <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl hover:border-brand-blue transition-colors group">
                     <div class="flex items-center gap-4">
@@ -162,7 +194,7 @@
                         <div><p class="text-[14px] font-extrabold text-brand-dark">Scan Ijazah / SKL</p></div>
                     </div>
                     <template x-if="dataSiswa.ijazah">
-                        <a :href="dataSiswa.ijazah" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors">
+                        <a :href="dataSiswa.ijazah" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors border border-gray-200">
                             Lihat File
                         </a>
                     </template>
@@ -178,7 +210,7 @@
                         <div><p class="text-[14px] font-extrabold text-brand-dark">Pas Foto 4x6</p></div>
                     </div>
                     <template x-if="dataSiswa.foto">
-                        <a :href="dataSiswa.foto" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors">
+                        <a :href="dataSiswa.foto" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors border border-gray-200">
                             Lihat File
                         </a>
                     </template>
@@ -194,7 +226,7 @@
                         <div><p class="text-[14px] font-extrabold text-brand-dark">Scan KTP</p></div>
                     </div>
                     <template x-if="dataSiswa.ktp">
-                        <a :href="dataSiswa.ktp" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors">
+                        <a :href="dataSiswa.ktp" target="_blank" class="px-4 py-2 bg-gray-50 text-brand-dark rounded-lg font-bold text-[11px] hover:bg-gray-100 transition-colors border border-gray-200">
                             Lihat File
                         </a>
                     </template>
@@ -228,7 +260,7 @@
                     <button type="submit" 
                             class="px-6 py-3 bg-brand-dark text-white hover:bg-brand-blue rounded-xl font-bold text-[13px] transition-colors shadow-lg flex items-center gap-2">
                         <i data-feather="check-square" class="w-4 h-4"></i> 
-                        Verifikasi Berkas (Lulus)
+                        Verifikasi Berkas (Valid/Selesai)
                     </button>
                 </form>
             </div>
@@ -240,12 +272,14 @@
     function validasiDaftarUlang() {
         return {
             modalOpen: false,
-            dataSiswa: { nama: '', noReg: '', dbId: '', prodi: '', status: '', foto: '', ktp: '', ijazah: '' },
+            // Tambahkan prodi1 dan prodi2
+            dataSiswa: { nama: '', noReg: '', dbId: '', prodi1: '', prodi2: '', status: '', foto: '', ktp: '', ijazah: '' },
             
-            bukaModal(nama, noReg, dbId, prodi, status, foto, ktp, ijazah) {
-                this.dataSiswa = { nama, noReg, dbId, prodi, status, foto, ktp, ijazah };
+            // Tangkap parameter prodi1 dan prodi2 dari fungsi
+            bukaModal(nama, noReg, dbId, prodi1, prodi2, status, foto, ktp, ijazah) {
+                this.dataSiswa = { nama, noReg, dbId, prodi1, prodi2, status, foto, ktp, ijazah };
                 this.modalOpen = true;
-                setTimeout(() => feather.replace(), 50);
+                setTimeout(() => { if(window.feather) feather.replace(); }, 50);
             }
         }
     }

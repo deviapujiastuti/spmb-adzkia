@@ -123,6 +123,7 @@
             </div>
         
         {{-- JIKA SUDAH UPLOAD TAPI MASIH MENUNGGU VALIDASI --}}
+        {{-- JIKA SUDAH UPLOAD TAPI MASIH MENUNGGU VALIDASI --}}
         @elseif($pendaftar->status_pembayaran === 'Menunggu Validasi')
             <div class="bg-white rounded-3xl p-10 text-center shadow-lg shadow-gray-200/50 border border-gray-100 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-amber-400"></div>
@@ -130,7 +131,12 @@
                     <i data-feather="clock" class="w-10 h-10"></i>
                 </div>
                 <h2 class="text-2xl font-black text-adzkia-dark mb-2">Bukti Pembayaran Sedang Diproses</h2>
-                <p class="text-gray-500 font-medium max-w-md mx-auto mb-6">Terima kasih! Kami telah menerima bukti pembayaran Anda. Tim Keuangan sedang melakukan verifikasi (Step 3) maksimal 1x24 jam.</p>
+                <p class="text-gray-500 font-medium max-w-md mx-auto mb-8">Terima kasih! Kami telah menerima bukti pembayaran Anda. Tim Keuangan sedang melakukan verifikasi (Step 3) maksimal 1x24 jam.</p>
+                
+                {{-- TAMBAHAN TOMBOL KEMBALI KE DASHBOARD --}}
+                <a href="{{ route('dashboard.user') }}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-gray-100 text-adzkia-dark rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-sm">
+                    <i data-feather="arrow-left" class="w-4 h-4"></i> Kembali ke Dasbor Calon Mahasiswa
+                </a>
             </div>
             
         {{-- JIKA SUDAH TERVERIFIKASI (REGULER) --}}

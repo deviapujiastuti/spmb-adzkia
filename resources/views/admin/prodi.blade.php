@@ -33,7 +33,10 @@
                                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                                     <i data-feather="book" class="w-5 h-5"></i>
                                 </div>
-                                <span class="font-bold text-brand-dark text-[15px]">{{ $item->nama }}</span>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-brand-dark text-[15px]">{{ $item->nama }}</span>
+                                    <span class="text-[11px] font-medium text-gray-400 mt-0.5 truncate max-w-[200px]" title="{{ $item->deskripsi }}">{{ $item->deskripsi ?? 'Belum ada deskripsi.' }}</span>
+                                </div>
                             </div>
                         </td>
                         <td class="px-4 py-5 font-bold text-gray-500">{{ $item->jenjang }}</td>
@@ -94,6 +97,12 @@
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Nama Program Studi</label>
                             <input type="text" name="nama" x-model="form.nama" placeholder="Misal: Teknik Elektro" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all font-bold text-sm">
                         </div>
+                        
+                        <div class="col-span-2">
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Deskripsi Singkat Prodi</label>
+                            <textarea name="deskripsi" x-model="form.deskripsi" rows="3" placeholder="Tuliskan penjelasan singkat mengenai prodi ini..." class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all font-bold text-sm resize-none"></textarea>
+                        </div>
+
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Jenjang</label>
                             <select name="jenjang" x-model="form.jenjang" class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-sm appearance-none">
@@ -141,18 +150,23 @@ document.addEventListener('alpine:init', () => {
             jenjang: 'S1',
             akreditasi: 'Unggul',
             kuota: '',
-            biaya: ''
+            biaya: '',
+            deskripsi: '' // Tambahan state deskripsi
         },
 
         openAddModal() {
             this.isEdit = false;
-            this.form = { id: '', nama: '', jenjang: 'S1', akreditasi: 'Unggul', kuota: '', biaya: '' };
+            this.form = { id: '', nama: '', jenjang: 'S1', akreditasi: 'Unggul', kuota: '', biaya: '', deskripsi: '' };
             this.modalOpen = true;
         },
 
         openEditModal(data) {
             this.isEdit = true;
             this.form = { ...data };
+            // Jika data dari database deskripsinya null, kita jadikan string kosong agar rapi di form
+            if (!this.form.deskripsi) {
+                this.form.deskripsi = '';
+            }
             this.modalOpen = true;
         }
     }));

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('akreditasi');
             $table->integer('kuota');
             $table->bigInteger('biaya');
+            $table->text('deskripsi')->nullable()->after('nama_prodi');
             $table->timestamps();
         });
     }
@@ -27,6 +28,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prodis');
+        Schema::table('prodis', function (Blueprint $table) {
+            $table->dropColumn('deskripsi');
+        });
     }
 };

@@ -32,6 +32,7 @@ class RegisterController extends Controller
     }
 
     // Memproses data yang dikirim dari form
+// Memproses data yang dikirim dari form
     public function storeRegister(Request $request)
     {
         // 1. Validasi Input dari Form
@@ -52,27 +53,18 @@ class RegisterController extends Controller
         ]);
 
         // 2. Tentukan Biaya berdasarkan Jalur
-        // Asumsi: Reguler = 250.000, Khusus (Prestasi/Yayasan) = Gratis (0)
         $nominalBiaya = ($request->jalur_pendaftaran === 'Reguler') ? 250000 : 0;
-        
-        // Jika biayanya 0, status langsung "Lunas/Terverifikasi", jika bayar statusnya "Belum Bayar"
         $statusPembayaran = ($nominalBiaya == 0) ? 'Terverifikasi' : 'Belum Bayar';
 
-        // 3. Generate Nomor Pendaftaran Otomatis (Contoh: REG-2026-0001)
+        // 3. Generate Nomor Pendaftaran Otomatis
         $tahun = date('Y');
-        // Cari pendaftar terakhir di tahun ini untuk menghitung urutan
         $pendaftarTerakhir = DataPendaftar::whereYear('created_at', $tahun)->orderBy('id', 'desc')->first();
         
-        if ($pendaftarTerakhir) {
-            $urutan = (int) substr($pendaftarTerakhir->no_pendaftaran, -4) + 1;
-        } else {
-            $urutan = 1;
-        }
-        
+        $urutan = $pendaftarTerakhir ? ((int) substr($pendaftarTerakhir->no_pendaftaran, -4) + 1) : 1;
         $noPendaftaran = 'REG-' . $tahun . '-' . str_pad($urutan, 4, '0', STR_PAD_LEFT);
 
-        // 4. Generate Password Acak 6 Karakter (Huruf & Angka)
-        $rawPassword = Str::upper(Str::random(6)); // Dibuat huruf besar agar mudah dibaca
+        // 4. Generate Password Acak 6 Karakter
+        $rawPassword = Str::upper(Str::random(6));
 
         // 5. Simpan ke Database
         $pendaftar = DataPendaftar::create([
@@ -85,21 +77,25 @@ class RegisterController extends Controller
             'pilihan_jurusan_1' => $request->pilihan_jurusan_1,
             'pilihan_jurusan_2' => $request->pilihan_jurusan_2,
             'alamat_rumah'      => $request->alamat_rumah,
-            'password'          => Hash::make($rawPassword), // Hash password sebelum simpan
+            'password'          => Hash::make($rawPassword),
             'nominal_biaya'     => $nominalBiaya,
             'status_pembayaran' => $statusPembayaran,
-            'status_pendaftaran' => 'Draft' // Status awal
+            'status_pendaftaran' => 'Draft'
         ]);
 
-        // 6. (Opsional) Kirim notifikasi WA
-        $this->kirimNotifikasiWA($pendaftar->no_whatsapp, $pendaftar->nama_lengkap, $noPendaftaran, $rawPassword);
-        
-        // 7. Arahkan ke halaman login sambil membawa Kunci Akses (Username & Password)
-        return redirect()->route('login')->with([
-            'success' => 'Pendaftaran Tahap 1 Berhasil!',
-            'no_pendaftaran' => $noPendaftaran,
-            'password'       => $rawPassword
+        // 6. AUTO-LOGIN SESSIONS
+        session([
+            'pendaftar_id' => $pendaftar->id,
+            'nama_pendaftar' => $pendaftar->nama_lengkap,
+            'role' => 'user' 
         ]);
+
+        // 7. LANGSUNG ARAHKAN KE TAHAP 2 (PEMBAYARAN)
+        // Kita selipkan informasi password di session 'success' agar muncul di halaman pembayaran
+        return redirect()->route('pembayaran.index')->with(
+            'success', 
+            "Pendaftaran Berhasil! Harap CATAT akses Anda untuk login berikutnya -> No. Pendaftaran: {$noPendaftaran} | Password: {$rawPassword}"
+        );
     }
 
     private function kirimNotifikasiWA($nomor, $nama, $username, $password)

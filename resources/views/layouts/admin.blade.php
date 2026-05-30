@@ -111,12 +111,16 @@
             </div>
             @endif
 
-            {{-- MENU HUMAS (Dilihat Super Admin & Humas) --}}
-            @if($isSuperAdmin || $divisi === 'Humas & Informasi')
-            <a href="/admin/pengumuman" @class(['flex items-center gap-3 px-4 py-3 font-bold rounded-xl transition-all relative', 'bg-brand-blue-light text-brand-blue' => request()->is('admin/pengumuman*'), 'text-brand-gray hover:bg-gray-50 hover:text-brand-dark' => !request()->is('admin/pengumuman*')])>
-                <span class="flex items-center justify-center"><i data-feather="volume-2" class="w-5 h-5"></i></span>
+{{-- MENU PENGUMUMAN KELULUSAN --}}
+            @if($isSuperAdmin || $divisi === 'Verifikator Berkas')
+            <a href="/admin/pengumuman" @class(['flex items-center gap-3 px-4 py-3 font-bold rounded-xl transition-all relative', 'bg-brand-blue-light text-brand-blue' => request()->is('admin/pengumuman*'), 'text-brand-gray hover:bg-gray-50' => !request()->is('admin/pengumuman*')])>
+                <span class="flex items-center justify-center"><i data-feather="award" class="w-5 h-5"></i></span>
                 <span class="text-[14px]">Pengumuman</span>
             </a>
+            @endif
+
+            {{-- MENU INFORMASI LAINNYA --}}
+            @if($isSuperAdmin || $divisi === 'Humas & Informasi')
             <a href="/admin/berita" @class(['flex items-center gap-3 px-4 py-3 font-bold rounded-xl transition-all relative', 'bg-brand-blue-light text-brand-blue' => request()->is('admin/berita*'), 'text-brand-gray hover:bg-gray-50' => !request()->is('admin/berita*')])>
                 <span class="flex items-center justify-center"><i data-feather="file-text" class="w-5 h-5"></i></span>
                 <span class="text-[14px]">Berita</span>

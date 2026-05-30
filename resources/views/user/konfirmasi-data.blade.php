@@ -27,7 +27,7 @@
 </head>
 <body class="bg-gray-50 antialiased text-adzkia-dark min-h-screen flex flex-col" x-data="konfirmasiApp()">
 
-    {{-- NAVBAR DASHBOARD USER (Konsisten) --}}
+    {{-- NAVBAR DASHBOARD USER --}}
     <nav class="bg-white border-b border-gray-200 py-4 px-6 md:px-10 flex justify-between items-center sticky top-0 z-30">
         <a href="{{ route('dashboard.user') }}" class="flex items-center gap-3 group">
             <img src="{{ asset('images/logo-adzkia.png') }}" alt="Logo" class="h-10 w-auto group-hover:scale-105 transition-transform">
@@ -52,7 +52,7 @@
         </div>
     </nav>
 
-    {{-- STEP PROGRESS TRACKER (Konsisten) --}}
+    {{-- STEP PROGRESS TRACKER --}}
     <div class="w-full bg-white py-6 border-b border-gray-100 z-20">
         <div class="max-w-5xl mx-auto px-6">
             <div class="flex items-center justify-between relative">
@@ -85,6 +85,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
+            {{-- KOLOM KIRI (Profil & Info) --}}
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center">
                     
@@ -107,7 +108,7 @@
                     </div>
                 </div>
 
-                <div class="flex gap-4 border-l-4 border-adzkia-red bg-red-50 rounded-r-xl pl-5 pr-4 py-4">
+                <div class="flex gap-4 border-l-4 border-adzkia-red bg-red-50 rounded-r-xl pl-5 pr-4 py-4 shadow-sm">
                     <i data-feather="info" class="w-5 h-5 text-adzkia-red shrink-0 mt-0.5"></i>
                     <div>
                         <h4 class="text-[14px] font-extrabold text-adzkia-red mb-1">Peringatan Penting</h4>
@@ -116,10 +117,10 @@
                 </div>
             </div>
 
+            {{-- KOLOM KANAN (Detail Data & Dokumen) --}}
             <div class="lg:col-span-8 space-y-6">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
                     {{-- DATA DIRI --}}
                     <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group">
                         <a href="{{ route('pendaftaran.biodata') }}" class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">Edit</a>
@@ -173,79 +174,89 @@
                     </div>
 
                     {{-- PENDIDIKAN --}}
-                    <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group md:col-span-2 lg:col-span-1">
+                    <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group md:col-span-2 lg:col-span-2">
                         <a href="{{ route('pendaftaran.biodata') }}" class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">Edit</a>
                         <div class="flex items-center gap-2 mb-6">
                             <i data-feather="book-open" class="w-4 h-4 text-adzkia-blue"></i>
                             <h3 class="text-[15px] font-extrabold text-adzkia-dark">Pendidikan Asal</h3>
                         </div>
-                        <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Sekolah Asal</p>
                                 <p class="text-[14px] font-bold text-adzkia-dark">{{ $pendaftar->sekolah_asal ?? '-' }}</p>
                             </div>
-                            <div class="flex gap-8">
-                                <div>
-                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Tahun Lulus</p>
-                                    <p class="text-[14px] font-bold text-adzkia-dark">{{ $pendaftar->tahun_lulus ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Nilai Akhir</p>
-                                    <p class="text-[14px] font-bold text-adzkia-dark">{{ $pendaftar->nilai_akhir ?? '-' }}</p>
-                                </div>
+                            <div>
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Tahun Lulus</p>
+                                <p class="text-[14px] font-bold text-adzkia-dark">{{ $pendaftar->tahun_lulus ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Nilai Akhir</p>
+                                <p class="text-[14px] font-bold text-adzkia-dark">{{ $pendaftar->nilai_akhir ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- DOKUMEN --}}
-                    <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative group md:col-span-2 lg:col-span-1">
-                        <a href="{{ route('pendaftaran.biodata') }}" class="absolute top-8 right-8 text-[12px] font-extrabold text-gray-400 underline underline-offset-2 hover:text-adzkia-red transition-colors">Edit</a>
-                        <div class="flex items-center gap-2 mb-6">
-                            <i data-feather="folder" class="w-4 h-4 text-adzkia-blue"></i>
-                            <h3 class="text-[15px] font-extrabold text-adzkia-dark">Dokumen Berkas</h3>
-                        </div>
+                {{-- BLOK REVIEW DOKUMEN (RAPI & SERAGAM) --}}
+                <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative">
+                    <h3 class="text-[15px] font-extrabold text-adzkia-dark mb-6 flex items-center gap-2">
+                        <i data-feather="paperclip" class="w-4 h-4 text-adzkia-blue"></i> Dokumen Terlampir
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         
-                        <div class="flex gap-4">
-                            @if(!empty($pendaftar->scan_ktp))
-                                <a href="{{ asset('storage/' . $pendaftar->scan_ktp) }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
-                                    <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-adzkia-blue border border-blue-200 group-hover/doc:bg-adzkia-blue group-hover/doc:text-white transition-colors relative">
-                                        <i data-feather="credit-card" class="w-5 h-5"></i>
-                                        <div class="absolute -top-1.5 -right-1.5 bg-green-500 rounded-full border-2 border-white text-white p-0.5 shadow-sm">
-                                            <i data-feather="check" class="w-2.5 h-2.5"></i>
-                                        </div>
-                                    </div>
-                                    <p class="text-[9px] font-bold text-adzkia-blue group-hover/doc:text-adzkia-dark transition-colors">KTP</p>
+                        {{-- Thumbnail Pas Foto --}}
+                        <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-4 hover:border-adzkia-blue transition-colors group">
+                            <div class="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
+                                <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Pas Foto" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[11px] font-black text-adzkia-dark uppercase tracking-widest">Pas Foto</span>
+                                <a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" class="text-[11px] font-bold text-adzkia-blue hover:text-adzkia-red transition-colors mt-0.5 flex items-center gap-1">
+                                    Lihat File <i data-feather="external-link" class="w-3 h-3"></i>
                                 </a>
-                            @else
-                                <div class="flex flex-col items-center gap-2 opacity-60">
-                                    <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 border border-gray-200"><i data-feather="credit-card" class="w-5 h-5"></i></div>
-                                    <p class="text-[9px] font-extrabold text-red-500">Kosong</p>
-                                </div>
-                            @endif
-
-                            @if(!empty($pendaftar->ijazah_skl))
-                                <a href="{{ asset('storage/' . $pendaftar->ijazah_skl) }}" target="_blank" class="flex flex-col items-center gap-2 group/doc">
-                                    <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-adzkia-blue border border-blue-200 group-hover/doc:bg-adzkia-blue group-hover/doc:text-white transition-colors relative">
-                                        <i data-feather="award" class="w-5 h-5"></i>
-                                        <div class="absolute -top-1.5 -right-1.5 bg-green-500 rounded-full border-2 border-white text-white p-0.5 shadow-sm">
-                                            <i data-feather="check" class="w-2.5 h-2.5"></i>
-                                        </div>
-                                    </div>
-                                    <p class="text-[9px] font-bold text-adzkia-blue group-hover/doc:text-adzkia-dark transition-colors">Ijazah</p>
-                                </a>
-                            @else
-                                <div class="flex flex-col items-center gap-2 opacity-60">
-                                    <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 border border-gray-200"><i data-feather="award" class="w-5 h-5"></i></div>
-                                    <p class="text-[9px] font-extrabold text-red-500">Kosong</p>
-                                </div>
-                            @endif
+                            </div>
                         </div>
-                    </div>
 
+                        {{-- Thumbnail KTP --}}
+                        <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-4 hover:border-indigo-400 transition-colors group">
+                            <div class="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
+                                @if(Str::endsWith($pendaftar->scan_ktp, '.pdf'))
+                                    <i data-feather="file-text" class="w-6 h-6 text-gray-400"></i>
+                                @else
+                                    <img src="{{ asset('storage/' . $pendaftar->scan_ktp) }}" alt="KTP" class="w-full h-full object-cover">
+                                @endif
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[11px] font-black text-adzkia-dark uppercase tracking-widest">Scan KTP</span>
+                                <a href="{{ asset('storage/' . $pendaftar->scan_ktp) }}" target="_blank" class="text-[11px] font-bold text-indigo-600 hover:text-adzkia-red transition-colors mt-0.5 flex items-center gap-1">
+                                    Lihat File <i data-feather="external-link" class="w-3 h-3"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Thumbnail Ijazah / SKL --}}
+                        <div class="border border-gray-200 rounded-xl p-3 flex items-center gap-4 hover:border-green-400 transition-colors group">
+                            <div class="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-gray-100">
+                                @if(Str::endsWith($pendaftar->ijazah_skl, '.pdf'))
+                                    <i data-feather="file-text" class="w-6 h-6 text-gray-400"></i>
+                                @else
+                                    <img src="{{ asset('storage/' . $pendaftar->ijazah_skl) }}" alt="Ijazah" class="w-full h-full object-cover">
+                                @endif
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[11px] font-black text-adzkia-dark uppercase tracking-widest">Ijazah / SKL</span>
+                                <a href="{{ asset('storage/' . $pendaftar->ijazah_skl) }}" target="_blank" class="text-[11px] font-bold text-green-600 hover:text-adzkia-red transition-colors mt-0.5 flex items-center gap-1">
+                                    Lihat File <i data-feather="external-link" class="w-3 h-3"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
                 {{-- PERSETUJUAN --}}
-                <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-4">
+                <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-5">
                     <label class="flex items-start gap-4 cursor-pointer group">
                         <div class="w-6 h-6 rounded flex items-center justify-center transition-colors shrink-0 mt-0.5 border-2"
                              :class="agreements.dataCorrect ? 'bg-adzkia-blue border-adzkia-blue' : 'bg-white border-gray-300 group-hover:border-adzkia-blue'">
@@ -269,7 +280,8 @@
                     </label>
                 </div>
 
-                <div class="flex flex-col items-center gap-4 pt-4">
+                {{-- TOMBOL AKSI --}}
+                <div class="flex flex-col items-center gap-4 pt-2">
                     <form action="{{ route('proses.konfirmasi', $pendaftar->id) }}" method="POST" class="w-full">
                         @csrf
                         <button type="submit"
@@ -280,8 +292,8 @@
                         </button>
                     </form>
                     
-                    <a href="{{ route('pendaftaran.biodata') }}" class="text-[13px] font-extrabold text-gray-500 hover:text-adzkia-blue transition-colors py-2">
-                        Kembali Edit Formulir
+                    <a href="{{ route('pendaftaran.biodata') }}" class="text-[13px] font-extrabold text-gray-500 hover:text-adzkia-blue transition-colors py-2 flex items-center gap-2">
+                        <i data-feather="edit-2" class="w-3.5 h-3.5"></i> Kembali Edit Formulir
                     </a>
                 </div>
 

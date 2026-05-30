@@ -116,9 +116,9 @@
             <p class="text-[15px] font-black text-adzkia-red italic mb-8">"Selamat bergabung bersama kami!"</p>
 
             <div class="flex flex-col items-center gap-4 relative z-10">
-                <button onclick="window.location.href='/'" class="w-full py-4 bg-adzkia-dark text-white rounded-2xl font-black text-[15px] hover:bg-adzkia-blue shadow-lg shadow-adzkia-dark/20 transition-all active:scale-[0.98]">
-                    Ke Dashboard
-                </button>
+                <a href="{{ route('dashboard.user') }}" class="w-full py-4 bg-adzkia-dark text-white rounded-2xl font-black text-[15px] hover:bg-adzkia-blue shadow-lg shadow-adzkia-dark/20 transition-all active:scale-[0.98] text-center flex justify-center items-center gap-2">
+                    Masuk ke Dasbor Calon Mahasiswa <i data-feather="arrow-right" class="w-4 h-4"></i>
+                </a>
                 <button class="flex items-center gap-2 text-[13px] font-extrabold text-adzkia-blue hover:text-adzkia-red transition-colors py-2">
                     <i data-feather="download" class="w-4 h-4"></i> Download Bukti Pendaftaran
                 </button>

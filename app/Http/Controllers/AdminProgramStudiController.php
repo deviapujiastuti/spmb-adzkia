@@ -31,6 +31,7 @@ class AdminProgramStudiController extends Controller
             'akreditasi' => 'required',
             'kuota'      => 'required|integer',
             'biaya'      => 'required|numeric',
+            'deskripsi'  => 'nullable|string',
         ]);
 
         Prodi::create($validated);

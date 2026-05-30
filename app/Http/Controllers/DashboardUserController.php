@@ -13,10 +13,18 @@ class DashboardUserController extends Controller
     // ==========================================
     public function dashboardUser()
     {
-        $pendaftar = DataPendaftar::find(session('pendaftar_id'));
-        if (!$pendaftar) return redirect()->route('login')->withErrors(['error' => 'Silakan login kembali.']);
+        $pendaftar = \App\Models\DataPendaftar::find(session('pendaftar_id'));
 
-        return view('user.dashboard-user', compact('pendaftar'));
+        if (!$pendaftar) {
+            return redirect()->route('login')->withErrors(['error' => 'Silakan login kembali.']);
+        }
+
+        // Ambil 2 Berita terbaru untuk ditampilkan di dashboard
+        $berita = \App\Models\Berita::latest()->take(2)->get();
+        $faqs = \App\Models\Faq::where('kategori', 'Dashboard User')->get();
+
+        // Kirim $pendaftar dan $berita ke tampilan
+        return view('user.dashboard-user', compact('pendaftar', 'berita', 'faqs'));
     }
 
     // ==========================================
@@ -78,8 +86,9 @@ class DashboardUserController extends Controller
 
     public function simpanBiodata(Request $request)
     {
-        $pendaftar = DataPendaftar::findOrFail($request->pendaftar_id);
-
+        $pendaftarId = session('pendaftar_id');
+        $pendaftar = \App\Models\DataPendaftar::findOrFail($pendaftarId);
+        
         $request->validate([
             'nama_lengkap'      => 'required|string|max:255',
             'nik'               => 'required|string|max:20',
@@ -91,7 +100,8 @@ class DashboardUserController extends Controller
             'ijazah_skl'        => ($pendaftar->ijazah_skl ? 'nullable' : 'required') . '|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $pendaftar->update($request->except(['_token', 'pas_foto', 'scan_ktp', 'ijazah_skl']));
+        // Mencegah input 'pendaftar_id' dari form HTML ikut ter-save ke database
+        $pendaftar->update($request->except(['_token', 'pas_foto', 'scan_ktp', 'ijazah_skl', 'pendaftar_id']));
 
         if ($request->hasFile('pas_foto'))   $pendaftar->update(['pas_foto' => $request->file('pas_foto')->store('dokumen/foto', 'public')]);
         if ($request->hasFile('scan_ktp'))   $pendaftar->update(['scan_ktp' => $request->file('scan_ktp')->store('dokumen/ktp', 'public')]);
@@ -103,16 +113,32 @@ class DashboardUserController extends Controller
     // ==========================================
     // 4. KONFIRMASI (STEP 5)
     // ==========================================
-    public function tampilkanKonfirmasi($id)
+public function tampilkanKonfirmasi($id)
     {
-        $pendaftar = DataPendaftar::findOrFail($id);
-        if ($pendaftar->id != session('pendaftar_id')) abort(403);
+        // KEAMANAN TINGKAT 2: Cegah pendaftar melihat konfirmasi milik orang lain
+        if ($id != session('pendaftar_id')) {
+            abort(403, 'Akses Ditolak. Anda tidak bisa melihat data orang lain.');
+        }
+
+        $pendaftar = \App\Models\DataPendaftar::findOrFail($id);
+
+        // MENCEGAH LOMPAT TAHAP: Jika nama lengkap/NIK belum diisi, kembalikan ke form biodata
+        if (empty($pendaftar->nama_lengkap) || empty($pendaftar->nik)) {
+            return redirect()->route('pendaftaran.biodata')
+                             ->with('error', 'Silakan lengkapi formulir biodata terlebih dahulu sebelum melakukan konfirmasi.');
+        }
+
         return view('user.konfirmasi-data', compact('pendaftar'));
     }
 
     public function prosesKonfirmasi($id)
     {
-        $pendaftar = DataPendaftar::findOrFail($id);
+        // KEAMANAN TINGKAT 3: Cegah pendaftar menekan tombol konfirmasi untuk akun lain
+        if ($id != session('pendaftar_id')) {
+            abort(403, 'Akses Ditolak.');
+        }
+
+        $pendaftar = \App\Models\DataPendaftar::findOrFail($id);
         $pendaftar->status_pendaftaran = 'menunggu verifikasi'; 
         $pendaftar->save();
 
@@ -122,10 +148,14 @@ class DashboardUserController extends Controller
     // ==========================================
     // 5. VALIDASI AKHIR & HASIL (STEP 6 & 7)
     // ==========================================
-    public function tampilkanValidasiAkhir($id)
+public function tampilkanValidasiAkhir($id)
     {
-        $pendaftar = DataPendaftar::findOrFail($id);
-        if ($pendaftar->id != session('pendaftar_id')) abort(403);
+        // KEAMANAN TINGKAT 4: Kunci akses ke halaman Validasi Akhir
+        if ($id != session('pendaftar_id')) {
+            abort(403, 'Akses Ditolak.');
+        }
+
+        $pendaftar = \App\Models\DataPendaftar::findOrFail($id);
         return view('user.validasi-akhir', compact('pendaftar'));
     }
 
@@ -134,5 +164,16 @@ class DashboardUserController extends Controller
         $pendaftar = DataPendaftar::find(session('pendaftar_id'));
         if (!$pendaftar) return redirect()->route('dashboard')->with('error', 'Data tidak ditemukan.');
         return view('user.sukses', compact('pendaftar'));
+    }
+    public function cetakLoA()
+    {
+        $pendaftar = DataPendaftar::find(session('pendaftar_id'));
+        
+        // Mencegah pendaftar yang belum lulus mencetak surat
+        if (!$pendaftar || strpos($pendaftar->status_kelulusan, 'Lulus') === false || $pendaftar->status_kelulusan == 'Tidak Lulus') {
+            return redirect()->route('dashboard.user')->with('error', 'Surat Keterangan Lulus belum tersedia.');
+        }
+
+        return view('user.cetak-loa', compact('pendaftar'));
     }
 }
