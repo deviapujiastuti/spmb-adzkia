@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'SPMB Universitas Adzkia'); ?>
 
-@section('title', 'SPMB Universitas Adzkia')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <section class="px-16 py-8 bg-adzkia-bg" x-data="{ 
     activeSlide: 0, 
     slides: [
@@ -75,7 +73,7 @@
         </div>
     </div>
     <div class="w-1/2 relative flex justify-end">
-        <img src="{{ asset('images/gedung-adzkia.png') }}" 
+        <img src="<?php echo e(asset('images/gedung-adzkia.png')); ?>" 
              class="w-[85%] h-[580px] object-cover rounded-[2.5rem] shadow-xl border-4 border-white" alt="Kampus">
         
         <div class="absolute bottom-10 left-4 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 border border-gray-100 pr-8">
@@ -138,7 +136,7 @@
     </div>
 
     <div class="grid md:grid-cols-3 gap-6 mb-12">
-        @forelse($prodis as $prodi)
+        <?php $__empty_1 = true; $__currentLoopData = $prodis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prodi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <a href="/program-studi" class="p-8 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[260px]">
                 <div>
                     <div class="flex justify-between items-start mb-6">
@@ -148,22 +146,22 @@
                         
                         <div class="px-3 py-1.5 bg-adzkia-blue text-white rounded-lg text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-1.5">
                             <i data-feather="award" class="w-3 h-3"></i>
-                            <span>{{ $prodi->akreditasi ?? 'B' }}</span>
+                            <span><?php echo e($prodi->akreditasi ?? 'B'); ?></span>
                         </div>
                     </div>
                     
-                    <div class="text-[12px] font-extrabold text-gray-400 mb-1">{{ $prodi->jenjang ?? 'S1' }}</div>
-                    <h3 class="text-xl font-extrabold text-adzkia-blue mb-3 group-hover:text-adzkia-red transition-colors">{{ $prodi->nama_prodi }}</h3>
-                    <p class="text-gray-500 text-[13px] leading-relaxed mb-6 font-medium line-clamp-2">{{ $prodi->deskripsi ?? 'Program studi unggulan yang siap mencetak generasi profesional.' }}</p>
+                    <div class="text-[12px] font-extrabold text-gray-400 mb-1"><?php echo e($prodi->jenjang ?? 'S1'); ?></div>
+                    <h3 class="text-xl font-extrabold text-adzkia-blue mb-3 group-hover:text-adzkia-red transition-colors"><?php echo e($prodi->nama_prodi); ?></h3>
+                    <p class="text-gray-500 text-[13px] leading-relaxed mb-6 font-medium line-clamp-2"><?php echo e($prodi->deskripsi ?? 'Program studi unggulan yang siap mencetak generasi profesional.'); ?></p>
                 </div>
                 
                 <p class="text-[13px] font-extrabold text-adzkia-red flex items-center gap-2 group-hover:gap-3 transition-all">
                     Detail Prodi <i data-feather="arrow-right" class="w-4 h-4"></i>
                 </p>
             </a>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="col-span-3 text-center py-8 text-gray-500 font-bold">Data Program Studi belum ditambahkan.</div>
-        @endforelse
+        <?php endif; ?>
     </div>
 
 <section id="fasilitas" class="px-16 py-24 bg-adzkia-blue text-white">
@@ -367,22 +365,25 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @forelse($beritas as $item)
+            <?php $__empty_1 = true; $__currentLoopData = $beritas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <a href="/berita" class="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col">
                     <div class="relative w-full h-48 overflow-hidden bg-gray-100">
                         <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-adzkia-blue text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest z-10">
-                            {{ $item->kategori ?? 'Informasi' }}
+                            <?php echo e($item->kategori ?? 'Informasi'); ?>
+
                         </div>
-                        <img src="{{ $item->thumbnail ? asset('uploads/berita/' . $item->thumbnail) : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=500' }}" 
-                            alt="{{ $item->judul }}" 
+                        <img src="<?php echo e($item->thumbnail ? asset('uploads/berita/' . $item->thumbnail) : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=500'); ?>" 
+                            alt="<?php echo e($item->judul); ?>" 
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
                     <div class="p-6 flex flex-col flex-grow">
                         <p class="text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-3">
-                            {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}
+                            <?php echo e(\Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y')); ?>
+
                         </p>
                         <h3 class="text-lg font-extrabold text-adzkia-blue group-hover:text-adzkia-red transition-colors mb-4 line-clamp-2">
-                            {{ $item->judul }}
+                            <?php echo e($item->judul); ?>
+
                         </h3>
                         <div class="mt-auto pt-4">
                             <p class="text-[12px] font-extrabold text-adzkia-red flex items-center gap-2 group-hover:gap-3 transition-all">
@@ -391,9 +392,9 @@
                         </div>
                     </div>
                 </a>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="col-span-1 md:col-span-3 text-center py-8 text-gray-500 font-bold">Belum ada berita terbaru.</div>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -402,19 +403,20 @@
     <div class="max-w-[800px] mx-auto">
         <h2 class="text-3xl font-extrabold text-adzkia-blue text-center mb-10">Pertanyaan Populer</h2>
         <div class="space-y-4">
-            @forelse($faqs as $faq)
+            <?php $__empty_1 = true; $__currentLoopData = $faqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div x-data="{ open: false }" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:border-adzkia-blue transition-colors" @click="open = !open">
                     <div class="flex justify-between items-center text-left">
-                        <span class="font-extrabold text-adzkia-blue">{{ $faq->pertanyaan }}</span>
+                        <span class="font-extrabold text-adzkia-blue"><?php echo e($faq->pertanyaan); ?></span>
                         <i data-feather="chevron-down" class="text-adzkia-red transition-transform" :class="open ? 'rotate-180' : ''"></i>
                     </div>
                     <div x-show="open" x-collapse style="display:none;" class="mt-4 text-gray-500 font-medium text-sm leading-relaxed">
-                        {{ $faq->jawaban }}
+                        <?php echo e($faq->jawaban); ?>
+
                     </div>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="text-center text-gray-500 font-bold py-4">Belum ada data FAQ yang ditambahkan admin.</div>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -485,4 +487,5 @@
         </div>
     </div>
 </section>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\Database\spmb-adzkia\resources\views/dashboard.blade.php ENDPATH**/ ?>
